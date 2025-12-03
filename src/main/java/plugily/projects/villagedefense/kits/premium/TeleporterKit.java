@@ -28,7 +28,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import plugily.projects.minigamesbox.classic.handlers.language.MessageBuilder;
-import plugily.projects.minigamesbox.classic.kits.basekits.PremiumKit;
 import plugily.projects.minigamesbox.classic.utils.helper.ArmorHelper;
 import plugily.projects.minigamesbox.classic.utils.helper.ItemBuilder;
 import plugily.projects.minigamesbox.classic.utils.helper.ItemUtils;
@@ -39,6 +38,7 @@ import plugily.projects.minigamesbox.classic.utils.version.events.api.PlugilyPla
 import plugily.projects.minigamesbox.classic.utils.version.xseries.XMaterial;
 import plugily.projects.minigamesbox.inventory.normal.NormalFastInv;
 import plugily.projects.villagedefense.arena.Arena;
+import plugily.projects.villagedefense.kits.base.VillagePremiumKit;
 
 import java.util.Collections;
 import java.util.List;
@@ -46,20 +46,18 @@ import java.util.List;
 /**
  * Created by Tom on 18/08/2014.
  */
-public class TeleporterKit extends PremiumKit implements Listener {
+public class TeleporterKit extends VillagePremiumKit implements Listener {
 
   public TeleporterKit() {
-    setName(new MessageBuilder("KIT_CONTENT_TELEPORTER_NAME").asKey().build());
-    setKey("Teleporter");
-    List<String> description = getPlugin().getLanguageManager().getLanguageListFromKey("KIT_CONTENT_TELEPORTER_DESCRIPTION");
-    setDescription(description);
-    getPlugin().getServer().getPluginManager().registerEvents(this, getPlugin());
-    getPlugin().getKitRegistry().registerKit(this);
+    super("Teleporter", "KIT_CONTENT_TELEPORTER_NAME", "KIT_CONTENT_TELEPORTER_DESCRIPTION",
+        new ItemStack(Material.ENDER_PEARL));
+    plugin().getServer().getPluginManager().registerEvents(this, plugin());
   }
 
   @Override
   public boolean isUnlockedByPlayer(Player player) {
-    return getPlugin().getPermissionsManager().hasPermissionString("KIT_PREMIUM_UNLOCK", player) || player.hasPermission("villagedefense.kit.teleporter");
+    return plugin().getPermissionsManager().hasPermissionString("KIT_PREMIUM_UNLOCK", player)
+        || player.hasPermission("villagedefense.kit.teleporter");
   }
 
   @Override
@@ -71,7 +69,7 @@ public class TeleporterKit extends PremiumKit implements Listener {
     player.getInventory().addItem(new ItemStack(Material.SADDLE));
     player.getInventory().addItem(new ItemBuilder(Material.GHAST_TEAR)
         .name(new MessageBuilder("KIT_CONTENT_TELEPORTER_GAME_ITEM_NAME").asKey().build())
-        .lore(getPlugin().getLanguageManager().getLanguageListFromKey("KIT_CONTENT_TELEPORTER_GAME_ITEM_DESCRIPTION"))
+        .lore(plugin().getLanguageManager().getLanguageListFromKey("KIT_CONTENT_TELEPORTER_GAME_ITEM_DESCRIPTION"))
         .build());
   }
 
@@ -91,7 +89,7 @@ public class TeleporterKit extends PremiumKit implements Listener {
       return;
     }
     Player player = e.getPlayer();
-    Arena arena = (Arena) getPlugin().getArenaRegistry().getArena(player);
+    Arena arena = (Arena) plugin().getArenaRegistry().getArena(player);
     if(arena == null) {
       return;
     }
@@ -103,17 +101,17 @@ public class TeleporterKit extends PremiumKit implements Listener {
     if(!ChatColor.stripColor(ComplementAccessor.getComplement().getDisplayName(stack.getItemMeta())).equalsIgnoreCase(ChatColor.stripColor(new MessageBuilder("KIT_CONTENT_TELEPORTER_GAME_ITEM_NAME").asKey().build()))) {
       return;
     }
-    if(!(getPlugin().getUserManager().getUser(player).getKit() instanceof TeleporterKit)) {
+    if(!(plugin().getUserManager().getUser(player).getKit() instanceof TeleporterKit)) {
       return;
     }
     int slots = arena.getVillagers().size();
     for(Player arenaPlayer : arena.getPlayers()) {
-      if(getPlugin().getUserManager().getUser(arenaPlayer).isSpectator()) {
+      if(plugin().getUserManager().getUser(arenaPlayer).isSpectator()) {
         continue;
       }
       slots++;
     }
-    slots = getPlugin().getBukkitHelper().serializeInt(slots);
+    slots = plugin().getBukkitHelper().serializeInt(slots);
     prepareTeleporterGui(player, arena, slots);
   }
 
@@ -121,7 +119,7 @@ public class TeleporterKit extends PremiumKit implements Listener {
     NormalFastInv gui = new NormalFastInv(slots, new MessageBuilder("KIT_CONTENT_TELEPORTER_GAME_ITEM_GUI").asKey().build());
     gui.addClickHandler(inventoryClickEvent -> inventoryClickEvent.setCancelled(true));
     for(Player arenaPlayer : arena.getPlayers()) {
-      if(getPlugin().getUserManager().getUser(arenaPlayer).isSpectator()) {
+      if(plugin().getUserManager().getUser(arenaPlayer).isSpectator()) {
         continue;
       }
       ItemStack skull = XMaterial.PLAYER_HEAD.parseItem();

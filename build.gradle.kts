@@ -25,23 +25,23 @@ plugins {
 
 repositories {
     mavenLocal()
+    mavenCentral()
+    maven(uri("https://repo.papermc.io/repository/maven-public/"))
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-    maven("https://oss.sonatype.org/content/repositories/snapshots")
-    maven("https://oss.sonatype.org/content/repositories/central")
-    maven(uri("https://papermc.io/repo/repository/maven-public/"))
     maven(uri("https://maven.plugily.xyz/releases"))
     maven(uri("https://maven.plugily.xyz/snapshots"))
     maven(uri("https://repo.citizensnpcs.co/"))
-    maven(uri("https://repo.maven.apache.org/maven2/"))
 }
 
 
 
 dependencies {
-    implementation("plugily.projects:MiniGamesBox-Classic:1.3.1") { isTransitive = false }
-    compileOnly("org.spigotmc:spigot-api:1.19.3-R0.1-SNAPSHOT")
+    implementation("plugily.projects:MiniGamesBox-Classic:1.4.3") { isTransitive = false }
+    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     compileOnly("org.jetbrains:annotations:24.0.1")
     compileOnly(files("lib/spigot/1.8.8-R0.1.jar"))
+
+    testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
 }
 
 group = "plugily.projects"
@@ -49,6 +49,7 @@ version = "4.7.0"
 description = "VillageDefense"
 java {
     withJavadocJar()
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
 tasks {
@@ -71,6 +72,10 @@ tasks {
 
     javadoc {
         options.encoding = "UTF-8"
+    }
+
+    test {
+        useJUnitPlatform()
     }
 
 }

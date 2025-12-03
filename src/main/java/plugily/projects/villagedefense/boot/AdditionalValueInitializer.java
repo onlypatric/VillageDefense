@@ -156,7 +156,7 @@ public class AdditionalValueInitializer {
   }
 
   private ConfigPreferences getConfigPreferences() {
-    return plugin.getConfigPreferences();
+    return (ConfigPreferences) plugin.getConfigPreferences();
   }
 
   private StatsStorage getStatsStorage() {

@@ -22,36 +22,30 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import plugily.projects.minigamesbox.classic.handlers.language.MessageBuilder;
-import plugily.projects.minigamesbox.classic.kits.basekits.PremiumKit;
 import plugily.projects.minigamesbox.classic.utils.helper.ArmorHelper;
 import plugily.projects.minigamesbox.classic.utils.helper.WeaponHelper;
 import plugily.projects.minigamesbox.classic.utils.version.VersionUtils;
 import plugily.projects.minigamesbox.classic.utils.version.xseries.XMaterial;
-
-import java.util.List;
+import plugily.projects.villagedefense.kits.base.VillagePremiumKit;
 
 /**
  * Created by Tom on 19/08/2014.
  */
-public class HeavyTankKit extends PremiumKit {
+public class HeavyTankKit extends VillagePremiumKit {
 
   public HeavyTankKit() {
-    setName(new MessageBuilder("KIT_CONTENT_HEAVY_TANK_NAME").asKey().build());
-    setKey("HeavyTank");
-    List<String> description = getPlugin().getLanguageManager().getLanguageListFromKey("KIT_CONTENT_HEAVY_TANK_DESCRIPTION");
-    setDescription(description);
-    getPlugin().getKitRegistry().registerKit(this);
+    super("HeavyTank", "KIT_CONTENT_HEAVY_TANK_NAME", "KIT_CONTENT_HEAVY_TANK_DESCRIPTION",
+        new ItemStack(Material.DIAMOND_CHESTPLATE));
   }
 
   @Override
   public boolean isUnlockedByPlayer(Player player) {
-    return getPlugin().getPermissionsManager().hasPermissionString("KIT_PREMIUM_UNLOCK", player) || player.hasPermission("villagedefense.kit.heavytank");
+    return plugin().getPermissionsManager().hasPermissionString("KIT_PREMIUM_UNLOCK", player) || player.hasPermission("villagedefense.kit.heavytank");
   }
 
   @Override
   public void giveKitItems(Player player) {
-    player.getInventory().addItem(WeaponHelper.getEnchanted(new ItemStack(Material.STICK), new Enchantment[]{Enchantment.DURABILITY, Enchantment.DAMAGE_ALL}, new int[]{10, 2}));
+    player.getInventory().addItem(WeaponHelper.getEnchanted(new ItemStack(Material.STICK), new Enchantment[]{Enchantment.UNBREAKING, Enchantment.SHARPNESS}, new int[]{10, 2}));
     player.getInventory().addItem(new ItemStack(XMaterial.COOKED_PORKCHOP.parseMaterial(), 8));
     VersionUtils.setMaxHealth(player, 40.0);
     player.setHealth(40.0);
