@@ -9,6 +9,8 @@
 ## Permissions
 The `villagedefense.admin.*` node grants a comprehensive set of privileges for arena creation, sign management, forcestarts, respawns, stat adjustments, and command overrides. Use granular children such as `villagedefense.admin.setwave`, `villagedefense.admin.clear`, or `villagedefense.admin.reload` to delegate specific abilities. 【F:src/main/resources/plugin.yml†L18-L45】
 
+For a step‑by‑step list of required arena setup commands and a practical admin checklist, see [`ADMIN_SETUP.md`](../../ADMIN_SETUP.md).
+
 ## Operational Toggles
 - **Bungee-Mode** can be enabled for arena-per-server setups and works with external hub sign plugins. 【F:src/main/resources/config.yml†L24-L29】
 - **Inventory Manager** safely stores and restores player state when entering or leaving arenas on multi-arena servers. 【F:src/main/resources/config.yml†L31-L35】

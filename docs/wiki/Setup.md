@@ -1,19 +1,47 @@
 # Setup & Installation
 
+This page explains how to build VillageDefense from source and get it running on a Paper 1.21.4+ server. For a more narrative, non‑wiki guide, see the root [`SETUP.md`](../../SETUP.md).
+
 ## Prerequisites
-- **Java toolchain**: The build uses Java toolchain 21 with classes compiled for release 17. 【F:build.gradle.kts†L50-L84】
-- **Server API**: Compile targets the Paper/Spigot API (1.21.4 snapshot) and the MiniGamesBox Classic framework. 【F:build.gradle.kts†L38-L44】
+
+- **Java toolchain**
+  - JDK 21 installed for development.
+  - Gradle compiler configured to emit Java 17‑compatible bytecode via `options.release = 17`.
+- **Server API**
+  - Paper 1.21.4 (or compatible fork).
+  - MiniGamesBox Classic is shaded into the final JAR; no separate plugin install is required.
 
 ## Building the Plugin
-1. Clone the repository and ensure the Gradle wrapper is executable.
-2. Run `./gradlew build` to produce a shaded JAR; the `build` task depends on `shadowJar`, which relocates bundled dependencies and clears the classifier for drop-in server use. 【F:build.gradle.kts†L55-L65】
-3. The resource processing step expands placeholders in `plugin.yml` using project properties, ensuring the final JAR has the correct plugin metadata. 【F:build.gradle.kts†L67-L71】
+
+1. Clone the repository and ensure the Gradle wrapper is executable:
+   - `git clone <repo-url>`
+   - `cd VillageDefense`
+2. Build with Gradle:
+   - `./gradlew clean build`
+   - This runs tests and then builds a shaded JAR; the `build` task depends on `shadowJar`, which relocates bundled dependencies and clears the classifier for drop‑in server use.
+3. Resource processing:
+   - `processResources` expands placeholders in `plugin.yml` from project properties so the final JAR has the correct name and version.
 
 ## Deploying to a Server
-1. Copy the built JAR from `build/libs` into your Paper/Spigot server's `plugins` directory.
-2. Start the server; Bukkit will load the plugin using the `plugily.projects.villagedefense.Main` entry point and register the `/villagedefense` and `/villagedefenseadmin` command namespaces. 【F:src/main/resources/plugin.yml†L1-L16】
+
+1. Copy the built JAR from `build/libs` into your Paper server's `plugins` directory.
+2. Start the server; Bukkit will load the plugin using the `plugily.projects.villagedefense.Main` entry point and register:
+   - `/villagedefense` (player commands, aliases `/vd`, `/villaged`)
+   - `/villagedefenseadmin` (admin commands, aliases `/vda`, `/villageadmin`)
+3. Stop the server once the startup finishes so you can edit the generated configuration files.
 
 ## Configuration Files
-VillageDefense ships with multiple YAML configuration files for arenas, kits, power-ups, rewards, leaderboards, and database connectivity. Key files include `config.yml`, `kits.yml`, `powerups.yml`, `entity_upgrades.yml`, `arenas.yml`, and supporting localization assets under `locales/`. 【db73d3†L1-L2】
 
-After deploying, start the server once to generate copies of these files in the plugin data folder, then tailor options such as locale, boss bar visibility, BungeeCord mode, inventory manager, and database usage inside `config.yml`. 【F:src/main/resources/config.yml†L9-L82】
+After the first run, VillageDefense creates multiple YAML files in its data folder. The most important ones are:
+
+- `config.yml` – global options (locale, boss bar, database, Bungee mode, inventory manager, chat formatting, etc.).
+- `arenas.yml` – arena instances, including lobby/start/end/spectator locations and the `isdone` flag.
+- `kits.yml` – kit unlocks and visibility.
+- `creatures.yml` – custom enemy types, attributes, spawn rates and weights.
+- `powerups.yml` – power‑up definitions and durations.
+- `entity_upgrades.yml` – optional golem/wolf upgrade pricing.
+- `language.yml` and `locales/` – messages and translations.
+
+Edit these to match your server’s needs, then restart the server (or use `/vda reload` for some non‑structural changes).
+
+For a full set of arena setup commands and required steps, see the admin‑oriented [`ADMIN_SETUP.md`](../../ADMIN_SETUP.md).
