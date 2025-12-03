@@ -25,14 +25,12 @@ plugins {
 
 repositories {
     mavenLocal()
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-    maven("https://oss.sonatype.org/content/repositories/snapshots")
-    maven("https://oss.sonatype.org/content/repositories/central")
+    mavenCentral()
     maven(uri("https://repo.papermc.io/repository/maven-public/"))
+    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
     maven(uri("https://maven.plugily.xyz/releases"))
     maven(uri("https://maven.plugily.xyz/snapshots"))
     maven(uri("https://repo.citizensnpcs.co/"))
-    maven(uri("https://repo.maven.apache.org/maven2/"))
 }
 
 
