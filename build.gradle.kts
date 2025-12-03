@@ -28,7 +28,7 @@ repositories {
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
     maven("https://oss.sonatype.org/content/repositories/snapshots")
     maven("https://oss.sonatype.org/content/repositories/central")
-    maven(uri("https://papermc.io/repo/repository/maven-public/"))
+    maven(uri("https://repo.papermc.io/repository/maven-public/"))
     maven(uri("https://maven.plugily.xyz/releases"))
     maven(uri("https://maven.plugily.xyz/snapshots"))
     maven(uri("https://repo.citizensnpcs.co/"))
@@ -39,7 +39,7 @@ repositories {
 
 dependencies {
     implementation("plugily.projects:MiniGamesBox-Classic:1.4.3") { isTransitive = false }
-    compileOnly("org.spigotmc:spigot-api:1.21.1-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     compileOnly("org.jetbrains:annotations:24.0.1")
     compileOnly(files("lib/spigot/1.8.8-R0.1.jar"))
 
