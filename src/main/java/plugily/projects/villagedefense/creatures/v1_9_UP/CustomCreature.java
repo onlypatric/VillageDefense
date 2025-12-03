@@ -55,6 +55,7 @@ public class CustomCreature implements SimpleEnemySpawner {
   private final boolean breed;
   private final int age;
   private final boolean ageLook;
+  private final int spawnWeight;
   private final int expDrop;
   private final boolean holidayEffects;
   private final List<Rate> rates;
@@ -66,10 +67,10 @@ public class CustomCreature implements SimpleEnemySpawner {
   private final ItemStack dropItem;
 
 
-  public CustomCreature(Main plugin, int waveMin, int waveMax, PriorityTarget priorityTarget, boolean explodeTarget, String key, EntityType entityType, boolean baby, boolean breed, int age, boolean ageLook, int expDrop, boolean holidayEffects, List<Rate> rates, Map<Attribute, Double> attributes, List<Equipment> equipments, ItemStack dropItem) {
+  public CustomCreature(Main plugin, int waveMin, int waveMax, PriorityTarget priorityTarget, boolean explodeTarget, String key, EntityType entityType, boolean baby, boolean breed, int age, boolean ageLook, int expDrop, boolean holidayEffects, int spawnWeight, List<Rate> rates, Map<Attribute, Double> attributes, List<Equipment> equipments, ItemStack dropItem) {
     this.priorityTarget = priorityTarget;
     this.explodeTarget = explodeTarget;
-    if(ServerVersion.Version.isCurrentEqualOrLower(ServerVersion.Version.v1_8_R3)) {
+    if(ServerVersion.Version.isCurrentEqualOrLower(ServerVersion.Version.v1_8_8)) {
       throw new IllegalStateException("Couldn't create Creature " + key + " as its only for Version 1.9+");
     }
     this.plugin = plugin;
@@ -81,6 +82,7 @@ public class CustomCreature implements SimpleEnemySpawner {
     this.breed = breed;
     this.age = age;
     this.ageLook = ageLook;
+    this.spawnWeight = spawnWeight;
     this.expDrop = expDrop;
     this.holidayEffects = holidayEffects;
     this.rates = rates;
@@ -160,6 +162,11 @@ public class CustomCreature implements SimpleEnemySpawner {
 
   public boolean isHolidayEffects() {
     return holidayEffects;
+  }
+
+  @Override
+  public int getSpawnWeight(Arena arena, int wave, int phase, int spawnAmount) {
+    return spawnWeight;
   }
 
   public List<Rate> getRates() {
@@ -262,14 +269,12 @@ public class CustomCreature implements SimpleEnemySpawner {
     Entity entity = VersionUtils.spawnEntity(location, entityType);
     if(entity instanceof Ageable) {
       Ageable ageable = (Ageable) entity;
-      ageable.setBreed(isBreed());
       if(isBaby()) {
         ageable.setBaby();
       } else {
         ageable.setAdult();
       }
       if(getAge() > 0) ageable.setAge(getAge());
-      ageable.setAgeLock(isAgeLook());
     }
     if(entity instanceof Creature) {
       Creature creature = (Creature) entity;
@@ -297,15 +302,15 @@ public class CustomCreature implements SimpleEnemySpawner {
             break;
         }
       }
-      creature.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(200D);
+      creature.getAttribute(Attribute.FOLLOW_RANGE).setBaseValue(200D);
       for(Map.Entry<Attribute, Double> attribute : attributes.entrySet()) {
         creature.getAttribute(attribute.getKey()).setBaseValue(attribute.getValue());
-        if(attribute.getKey() == Attribute.GENERIC_MAX_HEALTH) {
+        if(attribute.getKey() == Attribute.MAX_HEALTH) {
           VersionUtils.setMaxHealth(creature, attribute.getValue());
           creature.setHealth(attribute.getValue());
         }
       }
-      creature.setRemoveWhenFarAway(false);
+      creature.setPersistent(true);
       creature.setMetadata("PlugilyProjects-VillageDefense-Name", new FixedMetadataValue(plugin, key));
       return creature;
     } else {

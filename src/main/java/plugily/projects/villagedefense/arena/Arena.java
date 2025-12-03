@@ -28,17 +28,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.Wolf;
 import org.jetbrains.annotations.NotNull;
-import plugily.projects.minigamesbox.classic.arena.states.ArenaState;
+import plugily.projects.minigamesbox.api.arena.IArenaState;
 import plugily.projects.minigamesbox.classic.arena.PluginArena;
 import plugily.projects.minigamesbox.classic.handlers.language.MessageBuilder;
-import plugily.projects.minigamesbox.classic.utils.version.ServerVersion;
 import plugily.projects.villagedefense.Main;
 import plugily.projects.villagedefense.arena.managers.CreatureTargetManager;
 import plugily.projects.villagedefense.arena.managers.EnemySpawnManager;
 import plugily.projects.villagedefense.arena.managers.ScoreboardManager;
 import plugily.projects.villagedefense.arena.managers.ShopManager;
 import plugily.projects.villagedefense.arena.managers.maprestorer.MapRestorerManager;
-import plugily.projects.villagedefense.arena.managers.maprestorer.MapRestorerManagerLegacy;
 import plugily.projects.villagedefense.arena.states.EndingState;
 import plugily.projects.villagedefense.arena.states.InGameState;
 import plugily.projects.villagedefense.arena.states.RestartingState;
@@ -84,18 +82,14 @@ public class Arena extends PluginArena {
     shopManager = new ShopManager(this);
     enemySpawnManager = new EnemySpawnManager(this);
     creatureTargetManager = new CreatureTargetManager(this);
-    if(ServerVersion.Version.isCurrentEqualOrLower(ServerVersion.Version.v1_16_R1)) {
-      mapRestorerManager = new MapRestorerManagerLegacy(this);
-    } else {
-      mapRestorerManager = new MapRestorerManager(this);
-    }
+    mapRestorerManager = new MapRestorerManager(this);
     setMapRestorerManager(mapRestorerManager);
     setScoreboardManager(new ScoreboardManager(this));
 
-    addGameStateHandler(ArenaState.ENDING, new EndingState());
-    addGameStateHandler(ArenaState.IN_GAME, new InGameState());
-    addGameStateHandler(ArenaState.RESTARTING, new RestartingState());
-    addGameStateHandler(ArenaState.STARTING, new StartingState());
+    addGameStateHandler(IArenaState.ENDING, new EndingState());
+    addGameStateHandler(IArenaState.IN_GAME, new InGameState());
+    addGameStateHandler(IArenaState.RESTARTING, new RestartingState());
+    addGameStateHandler(IArenaState.STARTING, new StartingState());
   }
 
   public void reloadShopManager() {
@@ -235,7 +229,7 @@ public class Arena extends PluginArena {
   public void spawnVillager(Location location) {
     Villager villager = CreatureUtils.getCreatureInitializer().spawnVillager(location);
     villager.setCustomNameVisible(getPlugin().getConfigPreferences().getOption("NAME_VISIBILITY_VILLAGER"));
-    villager.setCustomName(CreatureUtils.getRandomVillagerName());
+    villager.customName(net.kyori.adventure.text.Component.text(CreatureUtils.getRandomVillagerName()));
     addVillager(villager);
   }
 
@@ -247,7 +241,9 @@ public class Arena extends PluginArena {
     Wolf wolf = CreatureUtils.getCreatureInitializer().spawnWolf(location);
     wolf.setOwner(player);
     wolf.setCustomNameVisible(getPlugin().getConfigPreferences().getOption("NAME_VISIBILITY_WOLF"));
-    wolf.setCustomName(new MessageBuilder("IN_GAME_MESSAGES_VILLAGE_WAVE_ENTITIES_WOLF_NAME").asKey().player(player).build());
+    wolf.customName(net.kyori.adventure.text.Component.text(
+        new MessageBuilder("IN_GAME_MESSAGES_VILLAGE_WAVE_ENTITIES_WOLF_NAME").asKey().player(player).build()
+    ));
     new MessageBuilder("IN_GAME_MESSAGES_VILLAGE_WAVE_ENTITIES_WOLF_SPAWN").asKey().player(player).sendPlayer();
     addWolf(wolf);
   }
@@ -259,7 +255,9 @@ public class Arena extends PluginArena {
 
     IronGolem ironGolem = CreatureUtils.getCreatureInitializer().spawnGolem(location);
     ironGolem.setCustomNameVisible(getPlugin().getConfigPreferences().getOption("NAME_VISIBILITY_GOLEM"));
-    ironGolem.setCustomName(new MessageBuilder("IN_GAME_MESSAGES_VILLAGE_WAVE_ENTITIES_GOLEM_NAME").asKey().player(player).build());
+    ironGolem.customName(net.kyori.adventure.text.Component.text(
+        new MessageBuilder("IN_GAME_MESSAGES_VILLAGE_WAVE_ENTITIES_GOLEM_NAME").asKey().player(player).build()
+    ));
     new MessageBuilder("IN_GAME_MESSAGES_VILLAGE_WAVE_ENTITIES_GOLEM_SPAWN").asKey().player(player).sendPlayer();
     addIronGolem(ironGolem);
   }
@@ -303,7 +301,9 @@ public class Arena extends PluginArena {
         return false;
       }
 
-      long spawnedPlayerAmount = entityList.stream().filter(entity -> Objects.equals(entity.getCustomName(), finalSpawnedName)).count();
+      long spawnedPlayerAmount = entityList.stream()
+          .filter(entity -> Objects.equals(plugily.projects.villagedefense.utils.Utils.getPlainCustomName(entity), finalSpawnedName))
+          .count();
       if(spawnedPlayerAmount >= entityLimit) {
         sendMobLimitReached(player, entityLimit);
         return false;

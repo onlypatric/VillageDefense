@@ -25,13 +25,16 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import plugily.projects.minigamesbox.classic.handlers.language.MessageBuilder;
 import plugily.projects.minigamesbox.classic.kits.basekits.LevelKit;
 import plugily.projects.minigamesbox.classic.utils.helper.ArmorHelper;
 import plugily.projects.minigamesbox.classic.utils.helper.WeaponHelper;
 import plugily.projects.minigamesbox.classic.utils.version.xseries.XMaterial;
+import plugily.projects.villagedefense.Main;
 import plugily.projects.villagedefense.creatures.CreatureUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,13 +43,17 @@ import java.util.List;
 public class LooterKit extends LevelKit implements Listener {
 
   public LooterKit() {
-    setName(new MessageBuilder("KIT_CONTENT_LOOTER_NAME").asKey().build());
-    setKey("Looter");
+    super("Looter",
+        new MessageBuilder("KIT_CONTENT_LOOTER_NAME").asKey().build(),
+        new ArrayList<>(),
+        new ItemStack(Material.ROTTEN_FLESH));
     List<String> description = getPlugin().getLanguageManager().getLanguageListFromKey("KIT_CONTENT_LOOTER_DESCRIPTION");
-    setDescription(description);
+    getDescription().clear();
+    getDescription().addAll(description);
     setLevel(getKitsConfig().getInt("Required-Level.Looter"));
-    getPlugin().getServer().getPluginManager().registerEvents(this, getPlugin());
-    getPlugin().getKitRegistry().registerKit(this);
+    Main plugin = JavaPlugin.getPlugin(Main.class);
+    plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    plugin.getKitRegistry().registerKit(this);
   }
 
   @Override
@@ -58,10 +65,9 @@ public class LooterKit extends LevelKit implements Listener {
   public void giveKitItems(Player player) {
     player.getInventory().addItem(WeaponHelper.getUnBreakingSword(WeaponHelper.ResourceType.STONE, 10));
     ArmorHelper.setColouredArmor(Color.ORANGE, player);
-    player.getInventory().addItem(new ItemStack(XMaterial.COOKED_PORKCHOP.parseMaterial(), 8));
+    player.getInventory().addItem(new ItemStack(XMaterial.COOKED_PORKCHOP.get(), 8));
   }
 
-  @Override
   public Material getMaterial() {
     return Material.ROTTEN_FLESH;
   }

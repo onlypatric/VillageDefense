@@ -33,9 +33,11 @@ import plugily.projects.minigamesbox.classic.utils.helper.ArmorHelper;
 import plugily.projects.minigamesbox.classic.utils.helper.WeaponHelper;
 import plugily.projects.minigamesbox.classic.utils.version.VersionUtils;
 import plugily.projects.minigamesbox.classic.utils.version.xseries.XMaterial;
+import plugily.projects.villagedefense.Main;
 import plugily.projects.villagedefense.arena.Arena;
 import plugily.projects.villagedefense.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -44,13 +46,17 @@ import java.util.List;
 public class WorkerKit extends LevelKit implements Listener {
 
   public WorkerKit() {
+    super("Worker",
+        new MessageBuilder("KIT_CONTENT_WORKER_NAME").asKey().build(),
+        new ArrayList<>(),
+        new ItemStack(XMaterial.OAK_DOOR.get()));
     setLevel(getKitsConfig().getInt("Required-Level.Worker"));
-    setName(new MessageBuilder("KIT_CONTENT_WORKER_NAME").asKey().build());
-    setKey("Worker");
     List<String> description = getPlugin().getLanguageManager().getLanguageListFromKey("KIT_CONTENT_WORKER_DESCRIPTION");
-    setDescription(description);
-    getPlugin().getKitRegistry().registerKit(this);
-    getPlugin().getServer().getPluginManager().registerEvents(this, getPlugin());
+    getDescription().clear();
+    getDescription().addAll(description);
+    Main plugin = org.bukkit.plugin.java.JavaPlugin.getPlugin(Main.class);
+    plugin.getKitRegistry().registerKit(this);
+    plugin.getServer().getPluginManager().registerEvents(this, plugin);
   }
 
   @Override
@@ -62,13 +68,12 @@ public class WorkerKit extends LevelKit implements Listener {
   public void giveKitItems(Player player) {
     ArmorHelper.setColouredArmor(Color.PURPLE, player);
     player.getInventory().addItem(WeaponHelper.getUnBreakingSword(WeaponHelper.ResourceType.WOOD, 10));
-    player.getInventory().addItem(WeaponHelper.getEnchantedBow(Enchantment.DURABILITY, 10));
-    player.getInventory().addItem(new ItemStack(XMaterial.ARROW.parseMaterial(), 64));
-    player.getInventory().addItem(new ItemStack(XMaterial.COOKED_BEEF.parseMaterial(), 10));
+    player.getInventory().addItem(WeaponHelper.getEnchantedBow(Enchantment.UNBREAKING, 10));
+    player.getInventory().addItem(new ItemStack(XMaterial.ARROW.get(), 64));
+    player.getInventory().addItem(new ItemStack(XMaterial.COOKED_BEEF.get(), 10));
     player.getInventory().addItem(new ItemStack(getMaterial(), 2));
   }
 
-  @Override
   public Material getMaterial() {
     return Utils.getCachedDoor(null);
   }

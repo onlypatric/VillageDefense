@@ -39,9 +39,9 @@ dependencies {
     implementation("plugily.projects:MiniGamesBox-Classic:1.4.3") { isTransitive = false }
     compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     compileOnly("org.jetbrains:annotations:24.0.1")
-    compileOnly(files("lib/spigot/1.8.8-R0.1.jar"))
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
+    testImplementation("org.mockbukkit.mockbukkit:mockbukkit-v1.21:4.0.0")
 }
 
 group = "plugily.projects"
@@ -78,6 +78,9 @@ tasks {
         useJUnitPlatform()
     }
 
+    withType<JavaCompile> {
+        options.release.set(17)
+    }
 }
 
 publishing {

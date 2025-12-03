@@ -33,9 +33,11 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.bukkit.plugin.java.JavaPlugin;
+import plugily.projects.minigamesbox.api.user.IUser;
 import plugily.projects.minigamesbox.classic.handlers.language.MessageBuilder;
 import plugily.projects.minigamesbox.classic.kits.basekits.PremiumKit;
-import plugily.projects.minigamesbox.classic.user.User;
+import plugily.projects.villagedefense.Main;
 import plugily.projects.minigamesbox.classic.utils.helper.ArmorHelper;
 import plugily.projects.minigamesbox.classic.utils.helper.ItemBuilder;
 import plugily.projects.minigamesbox.classic.utils.helper.ItemUtils;
@@ -58,17 +60,22 @@ public class WizardKit extends PremiumKit implements Listener {
   private final List<Player> wizardsOnDuty = new ArrayList<>();
 
   public WizardKit() {
-    setName(new MessageBuilder("KIT_CONTENT_WIZARD_NAME").asKey().build());
-    setKey("Wizard");
+    super("Wizard",
+        new MessageBuilder("KIT_CONTENT_WIZARD_NAME").asKey().build(),
+        new ArrayList<>(),
+        new ItemStack(Material.BLAZE_ROD));
     List<String> description = getPlugin().getLanguageManager().getLanguageListFromKey("KIT_CONTENT_WIZARD_DESCRIPTION");
-    setDescription(description);
-    getPlugin().getKitRegistry().registerKit(this);
-    getPlugin().getServer().getPluginManager().registerEvents(this, getPlugin());
+    getDescription().clear();
+    getDescription().addAll(description);
+    Main plugin = JavaPlugin.getPlugin(Main.class);
+    plugin.getKitRegistry().registerKit(this);
+    plugin.getServer().getPluginManager().registerEvents(this, plugin);
   }
 
   @Override
   public boolean isUnlockedByPlayer(Player player) {
-    return getPlugin().getPermissionsManager().hasPermissionString("KIT_PREMIUM_UNLOCK", player) || player.hasPermission("villagedefense.kit.wizard");
+    Main plugin = JavaPlugin.getPlugin(Main.class);
+    return plugin.getPermissionsManager().hasPermissionString("KIT_PREMIUM_UNLOCK", player) || player.hasPermission("villagedefense.kit.wizard");
   }
 
   @Override
@@ -77,7 +84,7 @@ public class WizardKit extends PremiumKit implements Listener {
         .name(new MessageBuilder("KIT_CONTENT_WIZARD_GAME_ITEM_WAND_NAME").asKey().build())
         .lore(getPlugin().getLanguageManager().getLanguageListFromKey("KIT_CONTENT_WIZARD_GAME_ITEM_WAND_DESCRIPTION"))
         .build());
-    player.getInventory().addItem(new ItemBuilder(new ItemStack(XMaterial.INK_SAC.parseMaterial(), 4))
+    player.getInventory().addItem(new ItemBuilder(new ItemStack(XMaterial.INK_SAC.get(), 4))
         .name(new MessageBuilder("KIT_CONTENT_WIZARD_GAME_ITEM_ESSENCE_NAME").asKey().build())
         .lore(getPlugin().getLanguageManager().getLanguageListFromKey("KIT_CONTENT_WIZARD_GAME_ITEM_ESSENCE_DESCRIPTION"))
         .build());
@@ -87,14 +94,13 @@ public class WizardKit extends PremiumKit implements Listener {
 
   }
 
-  @Override
   public Material getMaterial() {
     return Material.BLAZE_ROD;
   }
 
   @Override
   public void reStock(Player player) {
-    player.getInventory().addItem(new ItemBuilder(new ItemStack(XMaterial.INK_SAC.parseMaterial()))
+    player.getInventory().addItem(new ItemBuilder(new ItemStack(XMaterial.INK_SAC.get()))
         .name(new MessageBuilder("KIT_CONTENT_WIZARD_GAME_ITEM_ESSENCE_NAME").asKey().build())
         .lore(getPlugin().getLanguageManager().getLanguageListFromKey("KIT_CONTENT_WIZARD_GAME_ITEM_ESSENCE_DESCRIPTION"))
         .build());
@@ -110,7 +116,7 @@ public class WizardKit extends PremiumKit implements Listener {
     if(!(event.getDamager() instanceof Creature && event.getEntity() instanceof Player)) {
       return;
     }
-    if(!wizardsOnDuty.contains(event.getEntity()) || getPlugin().getArenaRegistry().getArena((Player) event.getEntity()) == null) {
+    if(!wizardsOnDuty.contains(event.getEntity()) || JavaPlugin.getPlugin(Main.class).getArenaRegistry().getArena((Player) event.getEntity()) == null) {
       return;
     }
     ((Creature) event.getDamager()).damage(2.0, event.getEntity());
@@ -122,7 +128,7 @@ public class WizardKit extends PremiumKit implements Listener {
       return;
     }
 
-    User user = getPlugin().getUserManager().getUser(event.getPlayer());
+    IUser user = getPlugin().getUserManager().getUser(event.getPlayer());
     if(user.isSpectator() || !(user.getKit() instanceof WizardKit)) {
       return;
     }
@@ -142,7 +148,7 @@ public class WizardKit extends PremiumKit implements Listener {
       } else {
         player.setHealth(VersionUtils.getMaxHealth(player));
       }
-      getPlugin().getBukkitHelper().takeOneItem(player, stack);
+      JavaPlugin.getPlugin(Main.class).getBukkitHelper().takeOneItem(player, stack);
       VersionUtils.setGlowing(player, true);
       applyRageParticles(player);
       for(Entity entity : player.getNearbyEntities(2, 2, 2)) {
@@ -150,7 +156,8 @@ public class WizardKit extends PremiumKit implements Listener {
           ((Creature) entity).damage(9.0, player);
         }
       }
-      Bukkit.getScheduler().runTaskLater(getPlugin(), () -> {
+      Main plugin = JavaPlugin.getPlugin(Main.class);
+      Bukkit.getScheduler().runTaskLater(plugin, () -> {
         VersionUtils.setGlowing(player, false);
         wizardsOnDuty.remove(player);
       }, 20L * 15);
@@ -171,11 +178,11 @@ public class WizardKit extends PremiumKit implements Listener {
         Location loc = player.getLocation();
         loc.add(0, 0.8, 0);
         VersionUtils.sendParticles("VILLAGER_ANGRY", null, loc, 5, 0, 0, 0);
-        if(!wizardsOnDuty.contains(player) || !getPlugin().getArenaRegistry().isInArena(player)) {
+        if(!wizardsOnDuty.contains(player) || !JavaPlugin.getPlugin(Main.class).getArenaRegistry().isInArena(player)) {
           cancel();
         }
       }
-    }.runTaskTimer(getPlugin(), 0, 2);
+    }.runTaskTimer(JavaPlugin.getPlugin(Main.class), 0, 2);
   }
 
   private void applyMagicAttack(Player player) {
@@ -204,7 +211,7 @@ public class WizardKit extends PremiumKit implements Listener {
           cancel();
         }
       }
-    }.runTaskTimer(getPlugin(), 0, 1);
+    }.runTaskTimer(JavaPlugin.getPlugin(Main.class), 0, 1);
   }
 
 }

@@ -18,7 +18,6 @@
 
 package plugily.projects.villagedefense.arena.managers;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
@@ -28,8 +27,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
+import plugily.projects.minigamesbox.api.user.IUser;
 import plugily.projects.minigamesbox.classic.handlers.language.MessageBuilder;
-import plugily.projects.minigamesbox.classic.user.User;
 import plugily.projects.minigamesbox.classic.utils.configuration.ConfigUtils;
 import plugily.projects.minigamesbox.classic.utils.helper.ItemUtils;
 import plugily.projects.minigamesbox.classic.utils.misc.complement.ComplementAccessor;
@@ -135,7 +134,9 @@ public class ShopManager {
       if(meta != null && meta.hasLore()) {
         for(String s : ComplementAccessor.getComplement().getLore(meta)) {
           if(s.contains(new MessageBuilder("IN_GAME_MESSAGES_VILLAGE_SHOP_CURRENCY").asKey().build()) || s.contains("orbs")) {
-            costString = ChatColor.stripColor(s).replaceAll("&[0-9a-zA-Z]", "").replaceAll("[^0-9]", "");
+            costString = plugily.projects.villagedefense.utils.Utils.stripColor(s)
+                .replaceAll("&[0-9a-zA-Z]", "")
+                .replaceAll("[^0-9]", "");
             break;
           }
         }
@@ -156,7 +157,7 @@ public class ShopManager {
           return;
         }
 
-        User user = plugin.getUserManager().getUser(player);
+        IUser user = plugin.getUserManager().getUser(player);
         int orbs = user.getStatistic("ORBS");
 
         if(cost > orbs) {
@@ -205,7 +206,7 @@ public class ShopManager {
     }
   }
 
-  private void adjustOrbs(User user, int cost) {
+  private void adjustOrbs(IUser user, int cost) {
     user.adjustStatistic("ORBS", -cost);
     arena.changeArenaOptionBy("TOTAL_ORBS_SPENT", cost);
   }

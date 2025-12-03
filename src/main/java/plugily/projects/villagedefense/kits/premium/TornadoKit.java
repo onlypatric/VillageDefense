@@ -28,6 +28,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import org.bukkit.plugin.java.JavaPlugin;
 import plugily.projects.minigamesbox.classic.handlers.language.MessageBuilder;
 import plugily.projects.minigamesbox.classic.kits.basekits.PremiumKit;
 import plugily.projects.minigamesbox.classic.utils.helper.ArmorHelper;
@@ -38,8 +39,10 @@ import plugily.projects.minigamesbox.classic.utils.misc.complement.ComplementAcc
 import plugily.projects.minigamesbox.classic.utils.version.VersionUtils;
 import plugily.projects.minigamesbox.classic.utils.version.events.api.PlugilyPlayerInteractEvent;
 import plugily.projects.minigamesbox.classic.utils.version.xseries.XMaterial;
+import plugily.projects.villagedefense.Main;
 import plugily.projects.villagedefense.creatures.CreatureUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -53,17 +56,22 @@ public class TornadoKit extends PremiumKit implements Listener {
   private int active = 0;
 
   public TornadoKit() {
-    setName(new MessageBuilder("KIT_CONTENT_TORNADO_NAME").asKey().build());
-    setKey("Tornado");
+    super("Tornado",
+        new MessageBuilder("KIT_CONTENT_TORNADO_NAME").asKey().build(),
+        new ArrayList<>(),
+        new ItemStack(XMaterial.COBWEB.get()));
     List<String> description = getPlugin().getLanguageManager().getLanguageListFromKey("KIT_CONTENT_TORNADO_DESCRIPTION");
-    setDescription(description);
-    getPlugin().getServer().getPluginManager().registerEvents(this, getPlugin());
-    getPlugin().getKitRegistry().registerKit(this);
+    getDescription().clear();
+    getDescription().addAll(description);
+    Main plugin = JavaPlugin.getPlugin(Main.class);
+    plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    plugin.getKitRegistry().registerKit(this);
   }
 
   @Override
   public boolean isUnlockedByPlayer(Player player) {
-    return player.hasPermission("villagedefense.kit.tornado") || getPlugin().getPermissionsManager().hasPermissionString("KIT_PREMIUM_UNLOCK", player);
+    Main plugin = JavaPlugin.getPlugin(Main.class);
+    return player.hasPermission("villagedefense.kit.tornado") || plugin.getPermissionsManager().hasPermissionString("KIT_PREMIUM_UNLOCK", player);
   }
 
   @Override
@@ -79,9 +87,8 @@ public class TornadoKit extends PremiumKit implements Listener {
         .build());
   }
 
-  @Override
   public Material getMaterial() {
-    return XMaterial.COBWEB.parseMaterial();
+    return XMaterial.COBWEB.get();
   }
 
   @Override
@@ -107,18 +114,20 @@ public class TornadoKit extends PremiumKit implements Listener {
         || !ComplementAccessor.getComplement().getDisplayName(stack.getItemMeta()).equalsIgnoreCase(new MessageBuilder("KIT_CONTENT_TORNADO_GAME_ITEM_NAME").asKey().build())) {
       return;
     }
-    if(!(getPlugin().getUserManager().getUser(player).getKit() instanceof TornadoKit)) {
+    Main plugin = JavaPlugin.getPlugin(Main.class);
+    if(!(plugin.getUserManager().getUser(player).getKit() instanceof TornadoKit)) {
       return;
     }
     if(active >= 2) {
       return;
     }
-    getPlugin().getBukkitHelper().takeOneItem(player, stack);
+    plugin.getBukkitHelper().takeOneItem(player, stack);
     e.setCancelled(true);
     prepareTornado(player.getLocation());
   }
 
   private void prepareTornado(Location location) {
+    Main plugin = JavaPlugin.getPlugin(Main.class);
     Tornado tornado = new Tornado(location);
     active++;
     new BukkitRunnable() {
@@ -130,7 +139,7 @@ public class TornadoKit extends PremiumKit implements Listener {
           active--;
         }
       }
-    }.runTaskTimer(getPlugin(), 1, 1);
+    }.runTaskTimer(plugin, 1, 1);
   }
 
   private class Tornado {

@@ -30,6 +30,7 @@ import plugily.projects.minigamesbox.classic.utils.helper.WeaponHelper;
 import plugily.projects.minigamesbox.classic.utils.version.VersionUtils;
 import plugily.projects.minigamesbox.classic.utils.version.xseries.XMaterial;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,10 +39,13 @@ import java.util.List;
 public class HardcoreKit extends LevelKit {
 
   public HardcoreKit() {
-    setName(new MessageBuilder("KIT_CONTENT_HARDCORE_NAME").asKey().build());
-    setKey("Hardcore");
+    super("Hardcore",
+        new MessageBuilder("KIT_CONTENT_HARDCORE_NAME").asKey().build(),
+        new ArrayList<>(),
+        new ItemStack(XMaterial.PLAYER_HEAD.get()));
     List<String> description = getPlugin().getLanguageManager().getLanguageListFromKey("KIT_CONTENT_HARDCORE_DESCRIPTION");
-    setDescription(description);
+    getDescription().clear();
+    getDescription().addAll(description);
     setLevel(getKitsConfig().getInt("Required-Level.Hardcore"));
     getPlugin().getKitRegistry().registerKit(this);
   }
@@ -55,18 +59,17 @@ public class HardcoreKit extends LevelKit {
   public void giveKitItems(Player player) {
     player.getInventory().addItem(WeaponHelper.getUnBreakingSword(WeaponHelper.ResourceType.WOOD, 10));
     ArmorHelper.setColouredArmor(Color.WHITE, player);
-    player.getInventory().addItem(VersionUtils.getPotion(PotionType.INSTANT_HEAL, 2, true));
+    player.getInventory().addItem(VersionUtils.getPotion(PotionType.HEALING, 2, true));
     player.getInventory().addItem(new ItemStack(Material.COOKIE, 10));
     VersionUtils.setMaxHealth(player, 10.0);
   }
 
-  @Override
   public Material getMaterial() {
-    return XMaterial.PLAYER_HEAD.parseMaterial();
+    return XMaterial.PLAYER_HEAD.get();
   }
 
   @Override
   public void reStock(Player player) {
-    player.getInventory().addItem(VersionUtils.getPotion(PotionType.INSTANT_HEAL, 2, true));
+    player.getInventory().addItem(VersionUtils.getPotion(PotionType.HEALING, 2, true));
   }
 }

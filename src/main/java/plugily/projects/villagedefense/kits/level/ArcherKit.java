@@ -28,6 +28,7 @@ import plugily.projects.minigamesbox.classic.kits.basekits.LevelKit;
 import plugily.projects.minigamesbox.classic.utils.helper.ArmorHelper;
 import plugily.projects.minigamesbox.classic.utils.helper.WeaponHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,11 +37,14 @@ import java.util.List;
 public class ArcherKit extends LevelKit {
 
   public ArcherKit() {
+    super("Archer",
+        new MessageBuilder("KIT_CONTENT_ARCHER_NAME").asKey().build(),
+        new ArrayList<>(),
+        new ItemStack(Material.BOW));
     setLevel(getKitsConfig().getInt("Required-Level.Archer"));
-    setName(new MessageBuilder("KIT_CONTENT_ARCHER_NAME").asKey().build());
-    setKey("Archer");
     List<String> description = getPlugin().getLanguageManager().getLanguageListFromKey("KIT_CONTENT_ARCHER_DESCRIPTION");
-    setDescription(description);
+    getDescription().clear();
+    getDescription().addAll(description);
     getPlugin().getKitRegistry().registerKit(this);
   }
 
@@ -53,12 +57,11 @@ public class ArcherKit extends LevelKit {
   public void giveKitItems(Player player) {
     ArmorHelper.setColouredArmor(Color.GREEN, player);
     player.getInventory().addItem(WeaponHelper.getUnBreakingSword(WeaponHelper.ResourceType.WOOD, 10));
-    player.getInventory().addItem(WeaponHelper.getEnchantedBow(Enchantment.DURABILITY, 10));
+    player.getInventory().addItem(WeaponHelper.getEnchantedBow(Enchantment.UNBREAKING, 10));
     player.getInventory().addItem(new ItemStack(Material.ARROW, 64));
     player.getInventory().addItem(new ItemStack(Material.COOKED_BEEF, 10));
   }
 
-  @Override
   public Material getMaterial() {
     return Material.BOW;
   }

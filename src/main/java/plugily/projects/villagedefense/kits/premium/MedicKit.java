@@ -27,15 +27,18 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionType;
+import plugily.projects.minigamesbox.api.user.IUser;
 import plugily.projects.minigamesbox.classic.handlers.language.MessageBuilder;
 import plugily.projects.minigamesbox.classic.kits.basekits.PremiumKit;
-import plugily.projects.minigamesbox.classic.user.User;
+import plugily.projects.villagedefense.Main;
 import plugily.projects.minigamesbox.classic.utils.helper.ArmorHelper;
 import plugily.projects.minigamesbox.classic.utils.helper.WeaponHelper;
 import plugily.projects.minigamesbox.classic.utils.version.VersionUtils;
 import plugily.projects.minigamesbox.classic.utils.version.xseries.XMaterial;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -44,28 +47,32 @@ import java.util.List;
 public class MedicKit extends PremiumKit implements Listener {
 
   public MedicKit() {
-    setName(new MessageBuilder("KIT_CONTENT_MEDIC_NAME").asKey().build());
-    setKey("Medic");
+    super("Medic",
+        new MessageBuilder("KIT_CONTENT_MEDIC_NAME").asKey().build(),
+        new ArrayList<>(),
+        new ItemStack(Material.GHAST_TEAR));
     List<String> description = getPlugin().getLanguageManager().getLanguageListFromKey("KIT_CONTENT_MEDIC_DESCRIPTION");
-    setDescription(description);
-    getPlugin().getServer().getPluginManager().registerEvents(this, getPlugin());
-    getPlugin().getKitRegistry().registerKit(this);
+    getDescription().clear();
+    getDescription().addAll(description);
+    Main plugin = JavaPlugin.getPlugin(Main.class);
+    plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    plugin.getKitRegistry().registerKit(this);
   }
 
   @Override
   public boolean isUnlockedByPlayer(Player player) {
-    return getPlugin().getPermissionsManager().hasPermissionString("KIT_PREMIUM_UNLOCK", player) || player.hasPermission("villagedefense.kit.medic");
+    Main plugin = JavaPlugin.getPlugin(Main.class);
+    return plugin.getPermissionsManager().hasPermissionString("KIT_PREMIUM_UNLOCK", player) || player.hasPermission("villagedefense.kit.medic");
   }
 
   @Override
   public void giveKitItems(Player player) {
     player.getInventory().addItem(WeaponHelper.getUnBreakingSword(WeaponHelper.ResourceType.STONE, 10));
     ArmorHelper.setColouredArmor(Color.WHITE, player);
-    player.getInventory().addItem(new ItemStack(XMaterial.COOKED_PORKCHOP.parseMaterial(), 8));
-    player.getInventory().addItem(VersionUtils.getPotion(PotionType.REGEN, 1, true));
+    player.getInventory().addItem(new ItemStack(XMaterial.COOKED_PORKCHOP.get(), 8));
+    player.getInventory().addItem(VersionUtils.getPotion(PotionType.REGENERATION, 1, true));
   }
 
-  @Override
   public Material getMaterial() {
     return Material.GHAST_TEAR;
   }
@@ -80,7 +87,7 @@ public class MedicKit extends PremiumKit implements Listener {
     if(!(e.getEntity() instanceof Creature) || !(e.getDamager() instanceof Player)) {
       return;
     }
-    User user = getPlugin().getUserManager().getUser((Player) e.getDamager());
+    IUser user = getPlugin().getUserManager().getUser((Player) e.getDamager());
     if(!(user.getKit() instanceof MedicKit) || Math.random() > 0.1) {
       return;
     }

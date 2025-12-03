@@ -18,7 +18,6 @@
 
 package plugily.projects.villagedefense.creatures;
 
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.IronGolem;
@@ -26,15 +25,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.Wolf;
 import plugily.projects.minigamesbox.classic.handlers.language.MessageBuilder;
-import plugily.projects.minigamesbox.classic.utils.version.ServerVersion;
 import plugily.projects.minigamesbox.classic.utils.version.VersionUtils;
 import plugily.projects.minigamesbox.string.StringFormatUtils;
 import plugily.projects.villagedefense.Main;
 import plugily.projects.villagedefense.arena.Arena;
 
 import java.lang.reflect.Field;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -59,16 +55,7 @@ public class CreatureUtils {
   public static void init(Main plugin) {
     CreatureUtils.plugin = plugin;
     villagerNames = new MessageBuilder("IN_GAME_MESSAGES_VILLAGE_VILLAGER_NAMES").asKey().build().split(",");
-    creatureInitializer = initCreatureInitializer();
-  }
-
-  public static BaseCreatureInitializer initCreatureInitializer() {
-    switch(ServerVersion.Version.getCurrent()) {
-      case v1_8_R3:
-        return new plugily.projects.villagedefense.creatures.v1_8_R3.CreatureInitializer();
-      default:
-        return new plugily.projects.villagedefense.creatures.v1_9_UP.CreatureInitializer();
-    }
+    creatureInitializer = new plugily.projects.villagedefense.creatures.v1_9_UP.CreatureInitializer();
   }
 
   public static Object getPrivateField(String fieldName, Class<?> clazz, Object object) {
@@ -80,10 +67,7 @@ public class CreatureUtils {
     try {
       Field field = clazz.getDeclaredField(fieldName);
 
-      AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
-        field.setAccessible(true);
-        return null;
-      });
+      field.setAccessible(true);
 
       Object o = field.get(object);
       cachedObjects.add(new CachedObject(fieldName, clazz, o));
@@ -119,8 +103,10 @@ public class CreatureUtils {
     zombie.setHealth(VersionUtils.getMaxHealth(zombie));
     if(plugin.getConfigPreferences().getOption("ZOMBIE_HEALTHBAR")) {
       zombie.setCustomNameVisible(true);
-      zombie.setCustomName(StringFormatUtils.getProgressBar((int) zombie.getHealth(), (int) VersionUtils.getMaxHealth(zombie), 50, "|",
-          ChatColor.YELLOW + "", ChatColor.GRAY + ""));
+      zombie.customName(net.kyori.adventure.text.Component.text(
+          StringFormatUtils.getProgressBar((int) zombie.getHealth(), (int) VersionUtils.getMaxHealth(zombie), 50, "|",
+              "\u00A7e", "\u00A77")
+      ));
     }
   }
 

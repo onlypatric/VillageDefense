@@ -18,11 +18,10 @@
 
 package plugily.projects.villagedefense.arena.states;
 
-import plugily.projects.minigamesbox.classic.arena.states.ArenaState;
+import plugily.projects.minigamesbox.api.arena.IArenaState;
 import plugily.projects.minigamesbox.classic.arena.PluginArena;
 import plugily.projects.minigamesbox.classic.arena.states.PluginInGameState;
 import plugily.projects.minigamesbox.classic.handlers.language.MessageBuilder;
-import plugily.projects.minigamesbox.classic.utils.version.ServerVersion;
 import plugily.projects.villagedefense.arena.Arena;
 
 /**
@@ -41,17 +40,15 @@ public class InGameState extends PluginInGameState {
     }
     pluginArena.getEnemySpawnManager().spawnGlitchCheck();
 
-    if(pluginArena.getVillagers().isEmpty() || arena.getPlayersLeft().isEmpty() && arena.getArenaState() != ArenaState.ENDING) {
+    if(pluginArena.getVillagers().isEmpty() || arena.getPlayersLeft().isEmpty() && arena.getArenaState() != IArenaState.ENDING) {
       getPlugin().getArenaManager().stopGame(false, arena);
       return;
     }
     int zombiesLeft = pluginArena.getZombiesLeft();
     getPlugin().getDebugger().debug("Arena {0} Zombies to spawn {1} Zombies left {2} Fighting {3}", arena.getId(), arena.getArenaOption("ZOMBIES_TO_SPAWN"), zombiesLeft, pluginArena.isFighting());
     if(pluginArena.isFighting()) {
-      if(ServerVersion.Version.isCurrentHigher(ServerVersion.Version.v1_8_R3)) {
-        pluginArena.getCreatureTargetManager().targetCreatures();
-        pluginArena.getCreatureTargetManager().targetRideableCreatures();
-      }
+      pluginArena.getCreatureTargetManager().targetCreatures();
+      pluginArena.getCreatureTargetManager().targetRideableCreatures();
       if(zombiesLeft <= 0) {
         pluginArena.setFighting(false);
         pluginArena.getPlugin().getArenaManager().endWave(pluginArena);
@@ -59,16 +56,14 @@ public class InGameState extends PluginInGameState {
         pluginArena.getEnemySpawnManager().spawnEnemies();
         setArenaTimer(500);
       }
-      if(ServerVersion.Version.isCurrentEqualOrHigher(ServerVersion.Version.v1_9_R1)) {
-        int zombiesLeftFrom = getPlugin().getConfig().getInt("Glowing-Status.Creatures-Left");
-        int startingWave;
-        if(zombiesLeftFrom > 0 && zombiesLeft <= zombiesLeftFrom
-            && (startingWave = getPlugin().getConfig().getInt("Glowing-Status.Starting-Wave")) > 0
-            && pluginArena.getWave() >= startingWave) {
-          for(org.bukkit.entity.Creature remaining : pluginArena.getEnemies()) {
-            if(!remaining.isGlowing()) { // To avoid setting glowing property every time
-              remaining.setGlowing(true);
-            }
+      int zombiesLeftFrom = getPlugin().getConfig().getInt("Glowing-Status.Creatures-Left");
+      int startingWave;
+      if(zombiesLeftFrom > 0 && zombiesLeft <= zombiesLeftFrom
+          && (startingWave = getPlugin().getConfig().getInt("Glowing-Status.Starting-Wave")) > 0
+          && pluginArena.getWave() >= startingWave) {
+        for(org.bukkit.entity.Creature remaining : pluginArena.getEnemies()) {
+          if(!remaining.isGlowing()) { // To avoid setting glowing property every time
+            remaining.setGlowing(true);
           }
         }
       }

@@ -52,14 +52,14 @@ public interface BaseCreatureInitializer {
   Creature spawnVillagerSlayer(Location location);
 
   default void applyFollowRange(Creature zombie) {
-    MiscUtils.getEntityAttribute(zombie, Attribute.GENERIC_FOLLOW_RANGE).ifPresent(ai -> ai.setBaseValue(200.0D));
+    MiscUtils.getEntityAttribute(zombie, Attribute.FOLLOW_RANGE).ifPresent(ai -> ai.setBaseValue(200.0D));
   }
 
   default void applyDamageModifier(LivingEntity entity, double value) {
-    MiscUtils.getEntityAttribute(entity, Attribute.GENERIC_ATTACK_DAMAGE).ifPresent(ai -> ai.setBaseValue(value));
+    MiscUtils.getEntityAttribute(entity, Attribute.ATTACK_DAMAGE).ifPresent(ai -> ai.setBaseValue(value));
   }
 
   default void applySpeedModifier(LivingEntity entity, double value) {
-    MiscUtils.getEntityAttribute(entity, Attribute.GENERIC_MOVEMENT_SPEED).ifPresent(ai -> ai.setBaseValue(value));
+    MiscUtils.getEntityAttribute(entity, Attribute.MOVEMENT_SPEED).ifPresent(ai -> ai.setBaseValue(value));
   }
 }

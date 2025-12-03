@@ -18,8 +18,11 @@
 
 package plugily.projects.villagedefense.utils;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import plugily.projects.minigamesbox.classic.utils.helper.MaterialUtils;
 import plugily.projects.minigamesbox.classic.utils.version.xseries.XMaterial;
 
@@ -34,8 +37,27 @@ public class Utils {
   public static Material getCachedDoor(Block block) {
     //material can not be cached as we allow other door types
     if(block == null) {
-      return XMaterial.OAK_DOOR.parseMaterial();
+      return XMaterial.OAK_DOOR.get();
     }
     return (MaterialUtils.isDoor(block.getType()) ? block.getType() : Material.AIR);
+  }
+
+  public static String stripColor(String input) {
+    if(input == null) {
+      return null;
+    }
+    // Remove legacy color codes using § or & prefixes
+    return input.replaceAll("(?i)[§&][0-9A-FK-OR]", "");
+  }
+
+  public static String getPlainCustomName(Entity entity) {
+    if(entity == null) {
+      return null;
+    }
+    Component customName = entity.customName();
+    if(customName == null) {
+      return null;
+    }
+    return PlainTextComponentSerializer.plainText().serialize(customName);
   }
 }

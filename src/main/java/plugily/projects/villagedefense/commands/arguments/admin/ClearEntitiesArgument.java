@@ -18,7 +18,6 @@
 
 package plugily.projects.villagedefense.commands.arguments.admin;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.Player;
@@ -55,7 +54,7 @@ public class ClearEntitiesArgument {
           return;
         }
         if(args.length == 1) {
-          new MessageBuilder(ChatColor.RED + "Please type valid mob type to clear: VILLAGER, ZOMBIE, IRON_GOLEM, WOLF").prefix().send(sender);
+          new MessageBuilder("\u00A7cPlease type valid mob type to clear: VILLAGER, ZOMBIE, IRON_GOLEM, WOLF").prefix().send(sender);
           return;
         }
         Arena arena = (Arena) registry.getPlugin().getArenaRegistry().getArena((Player) sender);

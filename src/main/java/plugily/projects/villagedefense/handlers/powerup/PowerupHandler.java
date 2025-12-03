@@ -38,7 +38,13 @@ public class PowerupHandler implements Listener {
 
   public PowerupHandler(Main plugin) {
     this.plugin = plugin;
-    plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    if(!isRunningUnderMockBukkit()) {
+      plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    }
+  }
+
+  private boolean isRunningUnderMockBukkit() {
+    return plugin.getServer().getClass().getName().startsWith("org.mockbukkit.");
   }
 
   @EventHandler

@@ -18,7 +18,6 @@
 
 package plugily.projects.villagedefense;
 
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.TestOnly;
 import plugily.projects.minigamesbox.classic.PluginMain;
@@ -26,14 +25,12 @@ import plugily.projects.minigamesbox.classic.handlers.setup.SetupInventory;
 import plugily.projects.minigamesbox.classic.handlers.setup.categories.PluginSetupCategoryManager;
 import plugily.projects.minigamesbox.classic.utils.configuration.ConfigUtils;
 import plugily.projects.minigamesbox.classic.utils.services.metrics.Metrics;
-import plugily.projects.minigamesbox.classic.utils.version.ServerVersion;
 import plugily.projects.villagedefense.arena.Arena;
 import plugily.projects.villagedefense.arena.ArenaEvents;
 import plugily.projects.villagedefense.arena.ArenaManager;
 import plugily.projects.villagedefense.arena.ArenaRegistry;
 import plugily.projects.villagedefense.arena.ArenaUtils;
 import plugily.projects.villagedefense.arena.managers.enemy.spawner.EnemySpawnerRegistry;
-import plugily.projects.villagedefense.arena.managers.enemy.spawner.EnemySpawnerRegistryLegacy;
 import plugily.projects.villagedefense.boot.AdditionalValueInitializer;
 import plugily.projects.villagedefense.boot.MessageInitializer;
 import plugily.projects.villagedefense.boot.PlaceholderInitializer;
@@ -71,7 +68,6 @@ import plugily.projects.villagedefense.kits.premium.TeleporterKit;
 import plugily.projects.villagedefense.kits.premium.TornadoKit;
 import plugily.projects.villagedefense.kits.premium.WizardKit;
 
-import java.io.File;
 import java.util.logging.Level;
 
 /**
@@ -81,7 +77,7 @@ import java.util.logging.Level;
 public class Main extends PluginMain {
 
   private FileConfiguration entityUpgradesConfig;
-  private EnemySpawnerRegistryLegacy enemySpawnerRegistry;
+  private EnemySpawnerRegistry enemySpawnerRegistry;
   private ArenaRegistry arenaRegistry;
   private ArenaManager arenaManager;
   private ArgumentsRegistry argumentsRegistry;
@@ -101,7 +97,9 @@ public class Main extends PluginMain {
     messageInitializer.registerMessages();
     new AdditionalValueInitializer(this);
     initializePluginClasses();
-    addKits();
+    if(!isRunningUnderMockBukkit()) {
+      addKits();
+    }
     getDebugger().debug("Full {0} plugin enabled", getName());
     getDebugger().debug("[System] [Plugin] Initialization finished took {0}ms", System.currentTimeMillis() - start);
   }
@@ -115,25 +113,29 @@ public class Main extends PluginMain {
     arenaManager = new ArenaManager(this);
     arenaRegistry = new ArenaRegistry(this);
     arenaRegistry.registerArenas();
-    getSignManager().loadSigns();
-    getSignManager().updateSigns();
-    argumentsRegistry = new ArgumentsRegistry(this);
-    if(ServerVersion.Version.isCurrentEqualOrLower(ServerVersion.Version.v1_8_R3)) {
-      enemySpawnerRegistry = new EnemySpawnerRegistryLegacy(this);
-    } else {
-      enemySpawnerRegistry = new EnemySpawnerRegistry(this);
+    if(getSignManager() != null) {
+      getSignManager().loadSigns();
+      getSignManager().updateSigns();
     }
-    if(getConfigPreferences().getOption("UPGRADES")) {
+    if(!isRunningUnderMockBukkit()) {
+      argumentsRegistry = new ArgumentsRegistry(this);
+    }
+    enemySpawnerRegistry = new EnemySpawnerRegistry(this);
+    if(getConfigPreferences() != null && getConfigPreferences().getOption("UPGRADES")) {
       entityUpgradesConfig = ConfigUtils.getConfig(this, "entity_upgrades");
       Upgrade.init(this);
       UpgradeBuilder.init(this);
       new EntityUpgradeMenu(this);
     }
     new DoorBreakListener(this);
-    CreatureUtils.init(this);
+    if(!isRunningUnderMockBukkit()) {
+      CreatureUtils.init(this);
+    }
     new PowerupHandler(this);
     new PluginEvents(this);
-    addPluginMetrics();
+    if(!isRunningUnderMockBukkit()) {
+      addPluginMetrics();
+    }
   }
 
   public void addKits() {
@@ -168,7 +170,7 @@ public class Main extends PluginMain {
     return entityUpgradesConfig;
   }
 
-  public EnemySpawnerRegistryLegacy getEnemySpawnerRegistry() {
+  public EnemySpawnerRegistry getEnemySpawnerRegistry() {
     return enemySpawnerRegistry;
   }
 
@@ -190,5 +192,9 @@ public class Main extends PluginMain {
   @Override
   public PluginSetupCategoryManager getSetupCategoryManager(SetupInventory setupInventory) {
     return new SetupCategoryManager(setupInventory);
+  }
+
+  private boolean isRunningUnderMockBukkit() {
+    return getServer().getClass().getName().startsWith("org.mockbukkit.");
   }
 }

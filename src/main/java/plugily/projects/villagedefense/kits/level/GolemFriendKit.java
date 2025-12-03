@@ -29,6 +29,7 @@ import plugily.projects.minigamesbox.classic.utils.helper.WeaponHelper;
 import plugily.projects.minigamesbox.classic.utils.version.xseries.XMaterial;
 import plugily.projects.villagedefense.arena.Arena;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -37,10 +38,13 @@ import java.util.List;
 public class GolemFriendKit extends LevelKit {
 
   public GolemFriendKit() {
-    setName(new MessageBuilder("KIT_CONTENT_GOLEM_FRIEND_NAME").asKey().build());
-    setKey("GolemFriend");
+    super("GolemFriend",
+        new MessageBuilder("KIT_CONTENT_GOLEM_FRIEND_NAME").asKey().build(),
+        new ArrayList<>(),
+        new ItemStack(Material.IRON_INGOT));
     List<String> description = getPlugin().getLanguageManager().getLanguageListFromKey("KIT_CONTENT_GOLEM_FRIEND_DESCRIPTION");
-    setDescription(description);
+    getDescription().clear();
+    getDescription().addAll(description);
     setLevel(getKitsConfig().getInt("Required-Level.GolemFriend"));
     getPlugin().getKitRegistry().registerKit(this);
   }
@@ -54,14 +58,13 @@ public class GolemFriendKit extends LevelKit {
   public void giveKitItems(Player player) {
     player.getInventory().addItem(WeaponHelper.getUnBreakingSword(WeaponHelper.ResourceType.STONE, 10));
     ArmorHelper.setColouredArmor(Color.WHITE, player);
-    player.getInventory().addItem(new ItemStack(XMaterial.COOKED_PORKCHOP.parseMaterial(), 8));
+    player.getInventory().addItem(new ItemStack(XMaterial.COOKED_PORKCHOP.get(), 8));
     Arena arena = (Arena) getPlugin().getArenaRegistry().getArena(player);
     if(arena != null) {
       spawnGolem(player, arena);
     }
   }
 
-  @Override
   public Material getMaterial() {
     return Material.IRON_INGOT;
   }

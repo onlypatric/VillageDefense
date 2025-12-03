@@ -19,12 +19,11 @@
 package plugily.projects.villagedefense.arena.managers.maprestorer;
 
 import org.bukkit.Location;
-import org.bukkit.TreeSpecies;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.type.Door;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.material.Door;
 import plugily.projects.minigamesbox.classic.arena.managers.PluginMapRestorerManager;
 import plugily.projects.minigamesbox.classic.utils.version.xseries.XMaterial;
 import plugily.projects.villagedefense.arena.Arena;
@@ -39,7 +38,6 @@ import java.util.logging.Level;
  * <p>
  * Created at 14.02.2019
  */
-@SuppressWarnings("deprecation")
 public class MapRestorerManager extends PluginMapRestorerManager {
 
   protected final Map<Location, Byte> doorBlocks = new LinkedHashMap<>();
@@ -78,7 +76,7 @@ public class MapRestorerManager extends PluginMapRestorerManager {
 
   public final void clearDroppedEntities() {
     for(Entity entity : arena.getPlugin().getBukkitHelper().getNearbyEntities(arena.getStartLocation(), 200)) {
-      if(entity.getType() == EntityType.EXPERIENCE_ORB || entity.getType() == EntityType.DROPPED_ITEM) {
+      if(entity.getType() == EntityType.EXPERIENCE_ORB || entity instanceof org.bukkit.entity.Item) {
         entity.remove();
       }
     }
@@ -105,7 +103,7 @@ public class MapRestorerManager extends PluginMapRestorerManager {
       Block block = entry.getKey().getBlock();
       Byte doorData = entry.getValue();
       try {
-        if(block.getType() != XMaterial.AIR.parseMaterial()) {
+        if(block.getType() != XMaterial.AIR.get()) {
           i++;
           continue;
         }
@@ -126,31 +124,27 @@ public class MapRestorerManager extends PluginMapRestorerManager {
   }
 
   public void restoreTopHalfDoorPart(Block block) {
-    block.setType(Utils.getCachedDoor(block));
-    BlockState doorBlockState = block.getState();
-    Door doorBlockData = new Door(TreeSpecies.GENERIC, arena.getPlugin().getBukkitHelper().getFacingByByte((byte) 8));
-
-    doorBlockData.setTopHalf(true);
-    doorBlockData.setFacingDirection(doorBlockData.getFacing());
-
-    doorBlockState.setType(doorBlockData.getItemType());
-    doorBlockState.setData(doorBlockData);
-
-    doorBlockState.update(true);
+    block.setType(Utils.getCachedDoor(block), false);
+    BlockData data = block.getBlockData();
+    if(!(data instanceof Door)) {
+      return;
+    }
+    Door doorData = (Door) data;
+    doorData.setHalf(Door.Half.TOP);
+    doorData.setFacing(arena.getPlugin().getBukkitHelper().getFacingByByte((byte) 8));
+    block.setBlockData(doorData, true);
   }
 
   public void restoreBottomHalfDoorPart(Block block, byte doorData) {
-    block.setType(Utils.getCachedDoor(block));
-    BlockState doorBlockState = block.getState();
-    Door doorBlockData = new Door(TreeSpecies.GENERIC, arena.getPlugin().getBukkitHelper().getFacingByByte(doorData));
-
-    doorBlockData.setTopHalf(false);
-    doorBlockData.setFacingDirection(doorBlockData.getFacing());
-
-    doorBlockState.setType(doorBlockData.getItemType());
-    doorBlockState.setData(doorBlockData);
-
-    doorBlockState.update(true);
+    block.setType(Utils.getCachedDoor(block), false);
+    BlockData data = block.getBlockData();
+    if(!(data instanceof Door)) {
+      return;
+    }
+    Door door = (Door) data;
+    door.setHalf(Door.Half.BOTTOM);
+    door.setFacing(arena.getPlugin().getBukkitHelper().getFacingByByte(doorData));
+    block.setBlockData(door, true);
   }
 
 }

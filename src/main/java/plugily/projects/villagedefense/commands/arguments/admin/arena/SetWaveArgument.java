@@ -18,7 +18,6 @@
 
 package plugily.projects.villagedefense.commands.arguments.admin.arena;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import plugily.projects.minigamesbox.classic.commands.arguments.data.CommandArgument;
@@ -48,7 +47,7 @@ public class SetWaveArgument {
           return;
         }
         if(args.length == 1) {
-          new MessageBuilder(ChatColor.RED + "Please type number of wave to set!").prefix().send(sender);
+          new MessageBuilder("\u00A7cPlease type number of wave to set!").prefix().send(sender);
           return;
         }
         java.util.Optional<Integer> opt = NumberUtils.parseInt(args[1]);

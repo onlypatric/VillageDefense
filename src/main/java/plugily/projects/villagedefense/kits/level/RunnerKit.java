@@ -31,6 +31,7 @@ import plugily.projects.minigamesbox.classic.utils.helper.ArmorHelper;
 import plugily.projects.minigamesbox.classic.utils.helper.WeaponHelper;
 import plugily.projects.minigamesbox.classic.utils.version.xseries.XMaterial;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,11 +40,14 @@ import java.util.List;
 public class RunnerKit extends LevelKit {
 
   public RunnerKit() {
+    super("Runner",
+        new MessageBuilder("KIT_CONTENT_RUNNER_NAME").asKey().build(),
+        new ArrayList<>(),
+        new ItemStack(XMaterial.FIREWORK_ROCKET.get()));
     setLevel(getKitsConfig().getInt("Required-Level.Runner"));
-    setName(new MessageBuilder("KIT_CONTENT_RUNNER_NAME").asKey().build());
-    setKey("Runner");
     List<String> description = getPlugin().getLanguageManager().getLanguageListFromKey("KIT_CONTENT_RUNNER_DESCRIPTION");
-    setDescription(description);
+    getDescription().clear();
+    getDescription().addAll(description);
     getPlugin().getKitRegistry().registerKit(this);
   }
 
@@ -55,21 +59,20 @@ public class RunnerKit extends LevelKit {
   @Override
   public void giveKitItems(Player player) {
     player.getInventory().addItem(WeaponHelper.getEnchanted(new ItemStack(Material.STICK), new Enchantment[]{
-        Enchantment.KNOCKBACK, Enchantment.DAMAGE_UNDEAD, Enchantment.DURABILITY}, new int[]{2, 1, 10}));
+        Enchantment.KNOCKBACK, Enchantment.SMITE, Enchantment.UNBREAKING}, new int[]{2, 1, 10}));
     ArmorHelper.setColouredArmor(Color.BLUE, player);
     player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2));
-    player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 1));
-    player.getInventory().addItem(new ItemStack(XMaterial.COOKED_PORKCHOP.parseMaterial(), 8));
+    player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, Integer.MAX_VALUE, 1));
+    player.getInventory().addItem(new ItemStack(XMaterial.COOKED_PORKCHOP.get(), 8));
   }
 
-  @Override
   public Material getMaterial() {
-    return XMaterial.FIREWORK_ROCKET.parseMaterial();
+    return XMaterial.FIREWORK_ROCKET.get();
   }
 
   @Override
   public void reStock(Player player) {
     player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2));
-    player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 1));
+    player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, Integer.MAX_VALUE, 1));
   }
 }

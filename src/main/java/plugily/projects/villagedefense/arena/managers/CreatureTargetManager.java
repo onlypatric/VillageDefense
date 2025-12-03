@@ -33,7 +33,6 @@ import plugily.projects.villagedefense.creatures.v1_9_UP.CustomCreature;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
 /**
  * @author Tigerpanzer_02

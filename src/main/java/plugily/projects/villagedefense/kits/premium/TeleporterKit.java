@@ -18,7 +18,6 @@
 
 package plugily.projects.villagedefense.kits.premium;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
@@ -41,7 +40,6 @@ import plugily.projects.villagedefense.arena.Arena;
 import plugily.projects.villagedefense.kits.base.VillagePremiumKit;
 
 import java.util.Collections;
-import java.util.List;
 
 /**
  * Created by Tom on 18/08/2014.
@@ -73,7 +71,6 @@ public class TeleporterKit extends VillagePremiumKit implements Listener {
         .build());
   }
 
-  @Override
   public Material getMaterial() {
     return Material.ENDER_PEARL;
   }
@@ -98,7 +95,10 @@ public class TeleporterKit extends VillagePremiumKit implements Listener {
     if(!ItemUtils.isItemStackNamed(stack))
       return;
 
-    if(!ChatColor.stripColor(ComplementAccessor.getComplement().getDisplayName(stack.getItemMeta())).equalsIgnoreCase(ChatColor.stripColor(new MessageBuilder("KIT_CONTENT_TELEPORTER_GAME_ITEM_NAME").asKey().build()))) {
+    String displayName = ComplementAccessor.getComplement().getDisplayName(stack.getItemMeta());
+    String expectedName = new MessageBuilder("KIT_CONTENT_TELEPORTER_GAME_ITEM_NAME").asKey().build();
+    if(!plugily.projects.villagedefense.utils.Utils.stripColor(displayName)
+        .equalsIgnoreCase(plugily.projects.villagedefense.utils.Utils.stripColor(expectedName))) {
       return;
     }
     if(!(plugin().getUserManager().getUser(player).getKit() instanceof TeleporterKit)) {
@@ -138,7 +138,7 @@ public class TeleporterKit extends VillagePremiumKit implements Listener {
     }
     for(Villager villager : arena.getVillagers()) {
       gui.addItem(new ItemBuilder(new ItemStack(Material.EMERALD))
-          .name(villager.getCustomName())
+          .name(plugily.projects.villagedefense.utils.Utils.getPlainCustomName(villager))
           .lore(villager.getUniqueId().toString())
           .build(), onClick -> {
         VersionUtils.teleport(player, villager.getLocation());

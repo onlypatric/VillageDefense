@@ -28,7 +28,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
 import plugily.projects.minigamesbox.classic.utils.version.VersionUtils;
 import plugily.projects.villagedefense.Main;
-import plugily.projects.villagedefense.arena.ArenaRegistry;
 import plugily.projects.villagedefense.utils.Utils;
 
 /**

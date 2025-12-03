@@ -18,7 +18,6 @@
 
 package plugily.projects.villagedefense.commands.arguments.admin;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -49,7 +48,7 @@ public class SetPriceArgument {
       @Override
       public void execute(CommandSender sender, String[] args) {
         if(args.length == 1) {
-          new MessageBuilder(ChatColor.RED + "Please type price of item!").prefix().send(sender);
+          new MessageBuilder("\u00A7cPlease type price of item!").prefix().send(sender);
           return;
         }
 
@@ -63,7 +62,7 @@ public class SetPriceArgument {
         ItemMeta meta = item.getItemMeta();
         if(meta == null || !meta.hasLore()) {
           VersionUtils.setItemInHand(player, new ItemBuilder(item)
-              .lore(ChatColor.GOLD + args[1] + " " + new MessageBuilder("IN_GAME_MESSAGES_VILLAGE_SHOP_CURRENCY").asKey().build()).build());
+              .lore("\u00A76" + args[1] + " " + new MessageBuilder("IN_GAME_MESSAGES_VILLAGE_SHOP_CURRENCY").asKey().build()).build());
           new MessageBuilder("COMMANDS_COMMAND_EXECUTED").asKey().player(player).sendPlayer();
           return;
         }
@@ -76,7 +75,7 @@ public class SetPriceArgument {
             break;
           }
         }
-        lore.add(0, ChatColor.GOLD + args[1] + " " + new MessageBuilder("IN_GAME_MESSAGES_VILLAGE_SHOP_CURRENCY").asKey().build());
+        lore.add(0, "\u00A76" + args[1] + " " + new MessageBuilder("IN_GAME_MESSAGES_VILLAGE_SHOP_CURRENCY").asKey().build());
         ComplementAccessor.getComplement().setLore(meta, lore);
         item.setItemMeta(meta);
         new MessageBuilder("COMMANDS_COMMAND_EXECUTED").asKey().player(player).sendPlayer();

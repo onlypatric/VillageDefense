@@ -115,9 +115,9 @@ public class CustomCreatureEvents implements Listener {
         entityTypes.add(EntityType.valueOf(priorityTarget.toString()));
       }
       if(entityTypes.contains(event.getEntity().getType())) {
-        event.getDamager().getLocation().getWorld().spawnEntity(event.getDamager().getLocation(), EntityType.PRIMED_TNT);
+        event.getDamager().getLocation().getWorld().spawnEntity(event.getDamager().getLocation(), EntityType.TNT);
         event.getDamager().remove();
-        Bukkit.getServer().getPluginManager().callEvent(new EntityDeathEvent((LivingEntity) event.getDamager(), new ArrayList<>(Collections.singletonList(new ItemStack(Material.ROTTEN_FLESH))), 6));
+        Bukkit.getServer().getPluginManager().callEvent(new EntityDeathEvent((LivingEntity) event.getDamager(), event.getDamageSource(), new ArrayList<>(Collections.singletonList(new ItemStack(Material.ROTTEN_FLESH))), 6));
       }
     }
   }

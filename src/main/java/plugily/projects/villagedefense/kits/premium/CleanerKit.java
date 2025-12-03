@@ -24,9 +24,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
+import plugily.projects.minigamesbox.api.user.IUser;
 import plugily.projects.minigamesbox.classic.handlers.language.MessageBuilder;
 import plugily.projects.minigamesbox.classic.kits.basekits.PremiumKit;
-import plugily.projects.minigamesbox.classic.user.User;
+import plugily.projects.villagedefense.Main;
 import plugily.projects.minigamesbox.classic.utils.helper.ArmorHelper;
 import plugily.projects.minigamesbox.classic.utils.helper.ItemBuilder;
 import plugily.projects.minigamesbox.classic.utils.helper.ItemUtils;
@@ -37,6 +39,7 @@ import plugily.projects.minigamesbox.classic.utils.version.events.api.PlugilyPla
 import plugily.projects.villagedefense.arena.Arena;
 import plugily.projects.villagedefense.arena.ArenaUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -45,17 +48,22 @@ import java.util.List;
 public class CleanerKit extends PremiumKit implements Listener {
 
   public CleanerKit() {
-    setName(new MessageBuilder("KIT_CONTENT_CLEANER_NAME").asKey().build());
-    setKey("Cleaner");
+    super("Cleaner",
+        new MessageBuilder("KIT_CONTENT_CLEANER_NAME").asKey().build(),
+        new ArrayList<>(),
+        new ItemStack(Material.BLAZE_POWDER));
     List<String> description = getPlugin().getLanguageManager().getLanguageListFromKey("KIT_CONTENT_CLEANER_DESCRIPTION");
-    setDescription(description);
-    getPlugin().getServer().getPluginManager().registerEvents(this, getPlugin());
-    getPlugin().getKitRegistry().registerKit(this);
+    getDescription().clear();
+    getDescription().addAll(description);
+    Main plugin = JavaPlugin.getPlugin(Main.class);
+    plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    plugin.getKitRegistry().registerKit(this);
   }
 
   @Override
   public boolean isUnlockedByPlayer(Player player) {
-    return getPlugin().getPermissionsManager().hasPermissionString("KIT_PREMIUM_UNLOCK", player) || player.hasPermission("villagedefense.kit.cleaner");
+    Main plugin = JavaPlugin.getPlugin(Main.class);
+    return plugin.getPermissionsManager().hasPermissionString("KIT_PREMIUM_UNLOCK", player) || player.hasPermission("villagedefense.kit.cleaner");
   }
 
   @Override
@@ -70,7 +78,6 @@ public class CleanerKit extends PremiumKit implements Listener {
     player.getInventory().addItem(new ItemStack(Material.SADDLE));
   }
 
-  @Override
   public Material getMaterial() {
     return Material.BLAZE_POWDER;
   }
@@ -91,7 +98,7 @@ public class CleanerKit extends PremiumKit implements Listener {
         .contains(new MessageBuilder("KIT_CONTENT_CLEANER_GAME_ITEM_NAME").asKey().build())) {
       return;
     }
-    User user = getPlugin().getUserManager().getUser(event.getPlayer());
+    IUser user = getPlugin().getUserManager().getUser(event.getPlayer());
     if(!(user.getKit() instanceof CleanerKit)) {
       return;
     }

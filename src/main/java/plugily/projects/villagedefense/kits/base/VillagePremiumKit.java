@@ -9,8 +9,10 @@ import plugily.projects.villagedefense.Main;
 public abstract class VillagePremiumKit extends PremiumKit {
 
   protected VillagePremiumKit(String key, String nameKey, String descriptionKey, ItemStack icon) {
-    super(new MessageBuilder(nameKey).asKey().build(), key,
-        JavaPlugin.getPlugin(Main.class).getLanguageManager().getLanguageListFromKey(descriptionKey), icon);
+    super(key,
+        new MessageBuilder(nameKey).asKey().build(),
+        JavaPlugin.getPlugin(Main.class).getLanguageManager().getLanguageListFromKey(descriptionKey),
+        icon);
     JavaPlugin.getPlugin(Main.class).getKitRegistry().registerKit(this);
   }
 

@@ -33,25 +33,76 @@ import plugily.projects.villagedefense.creatures.v1_9_UP.Equipment;
 import plugily.projects.villagedefense.creatures.v1_9_UP.Rate;
 
 import java.util.ArrayList;
-import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
+import java.lang.reflect.Field;
 
 /**
  * @author Tigerpanzer_02
  * <p>
  * Created at 01.05.2022
  */
-public class EnemySpawnerRegistry extends EnemySpawnerRegistryLegacy {
+public class EnemySpawnerRegistry {
   private static final String CREATURES_MISSING_SECTION = "Creatures section {0} is missing! Was it manually removed?";
 
+  private final java.util.Set<plugily.projects.villagedefense.arena.managers.spawner.EnemySpawner> enemySpawnerSet = new java.util.TreeSet<>(java.util.Collections.reverseOrder());
+  private final java.util.Set<CustomRideableCreature> rideableCreatures = new java.util.HashSet<>();
+  protected final Main plugin;
+
   public EnemySpawnerRegistry(Main plugin) {
-    super(plugin);
+    this.plugin = plugin;
   }
 
-  @Override
+  /**
+   * Spawn the enemies at the arena
+   *
+   * @param random the random instance
+   * @param arena  the arena
+   */
+  public void spawnEnemies(java.util.Random random, plugily.projects.villagedefense.arena.Arena arena) {
+    int spawn = arena.getWave();
+    int zombiesLimit = plugin.getConfig().getInt("Limit.Spawn.Creatures", 75);
+    if(zombiesLimit < spawn) {
+      spawn = (int) Math.ceil(zombiesLimit / 2.0);
+    }
+    String zombieSpawnCounterOption = "ZOMBIE_SPAWN_COUNTER";
+    arena.changeArenaOptionBy(zombieSpawnCounterOption, 1);
+    if(arena.getArenaOption(zombieSpawnCounterOption) == 20) {
+      arena.setArenaOption(zombieSpawnCounterOption, 0);
+    }
+
+    java.util.List<plugily.projects.villagedefense.arena.managers.spawner.EnemySpawner> enemySpawners = new java.util.ArrayList<>(enemySpawnerSet);
+    java.util.Collections.shuffle(enemySpawners);
+    for(plugily.projects.villagedefense.arena.managers.spawner.EnemySpawner enemySpawner : enemySpawners) {
+      plugin.getDebugger().debug("Trying enemy spawn for " + enemySpawner.getName());
+      enemySpawner.spawn(random, arena, spawn);
+    }
+  }
+
+  public java.util.Set<plugily.projects.villagedefense.arena.managers.spawner.EnemySpawner> getEnemySpawnerSet() {
+    return enemySpawnerSet;
+  }
+
+  public java.util.Set<CustomRideableCreature> getRideableCreatures() {
+    return rideableCreatures;
+  }
+
+  public java.util.Optional<CustomRideableCreature> getRideableCreatureByName(CustomRideableCreature.RideableType type) {
+    return rideableCreatures.stream()
+        .filter(creature -> creature.getRideableType().equals(type))
+        .findFirst();
+  }
+
+  public java.util.Optional<plugily.projects.villagedefense.arena.managers.spawner.EnemySpawner> getSpawnerByName(String name) {
+    return enemySpawnerSet.stream()
+        .filter(enemySpawner -> enemySpawner.getName().equals(name))
+        .findFirst();
+  }
+
   public void registerRideableCreatures() {
-    if(ServerVersion.Version.isCurrentEqualOrLower(ServerVersion.Version.v1_8_R3)) {
+    if(ServerVersion.Version.isCurrentEqualOrLower(ServerVersion.Version.v1_8_8)) {
       return;
     }
     FileConfiguration config = ConfigUtils.getConfig(plugin, "creatures");
@@ -63,7 +114,7 @@ public class EnemySpawnerRegistry extends EnemySpawnerRegistryLegacy {
     for(String rideable : village.getKeys(false)) {
       CustomRideableCreature.RideableType rideableType = CustomRideableCreature.RideableType.valueOf(rideable.toUpperCase().replace("RIDEABLE_", ""));
       boolean holidayEffects = village.getBoolean(rideable + ".holiday_effects", false);
-      EnumMap<Attribute, Double> attributes = new EnumMap<>(Attribute.class);
+      Map<Attribute, Double> attributes = new HashMap<>();
       ConfigurationSection attributeSection = village.getConfigurationSection(rideable + ".attributes");
       if(attributeSection == null) {
         plugin.getDebugger().debug(Level.WARNING, CREATURES_MISSING_SECTION, "Creatures.Village." + rideable + ".attributes");
@@ -71,7 +122,12 @@ public class EnemySpawnerRegistry extends EnemySpawnerRegistryLegacy {
       }
       for(String attribute : attributeSection.getKeys(false)) {
         try {
-          attributes.put(Attribute.valueOf(attribute.toUpperCase()), attributeSection.getDouble(attribute));
+          Attribute attr = getAttributeByName(attribute.toUpperCase());
+          if(attr != null) {
+            attributes.put(attr, attributeSection.getDouble(attribute));
+          } else {
+            throw new IllegalArgumentException("Unknown attribute " + attribute);
+          }
         } catch(IllegalArgumentException exception) {
           plugin.getDebugger().debug(Level.WARNING, "Creatures attribute {0} not found! Check JavaDocs?", "Creatures.Village." + rideable + ".attributes." + attribute);
         }
@@ -87,7 +143,6 @@ public class EnemySpawnerRegistry extends EnemySpawnerRegistryLegacy {
     }
   }
 
-  @Override
   public void registerCreatures() {
     new CustomCreatureEvents(plugin);
     FileConfiguration config = ConfigUtils.getConfig(plugin, "creatures");
@@ -120,6 +175,7 @@ public class EnemySpawnerRegistry extends EnemySpawnerRegistryLegacy {
       boolean ageLook = content.getBoolean(creature + ".age_lock", false);
       boolean holidayEffects = content.getBoolean(creature + ".holiday_effects", true);
       int expDrop = content.getInt(creature + ".exp", 0);
+      int spawnWeight = content.getInt(creature + ".weight", 1);
 
       List<Rate> rates = new ArrayList<>();
       ConfigurationSection rate = content.getConfigurationSection(creature + ".rates");
@@ -139,7 +195,7 @@ public class EnemySpawnerRegistry extends EnemySpawnerRegistryLegacy {
         rates.add(new Rate(phase, waveHigher, waveLower, spawnLower, rateInt, division, reduce, rateTypeValue));
       }
 
-      EnumMap<Attribute, Double> attributes = new EnumMap<>(Attribute.class);
+      Map<Attribute, Double> attributes = new HashMap<>();
       ConfigurationSection attributeSection = content.getConfigurationSection(creature + ".attributes");
       if(attributeSection == null) {
         plugin.getDebugger().debug(Level.WARNING, CREATURES_MISSING_SECTION, "Creatures.Content." + creature + ".attributes");
@@ -147,7 +203,12 @@ public class EnemySpawnerRegistry extends EnemySpawnerRegistryLegacy {
       }
       for(String attribute : attributeSection.getKeys(false)) {
         try {
-          attributes.put(Attribute.valueOf(attribute.toUpperCase()), attributeSection.getDouble(attribute));
+          Attribute attr = getAttributeByName(attribute.toUpperCase());
+          if(attr != null) {
+            attributes.put(attr, attributeSection.getDouble(attribute));
+          } else {
+            throw new IllegalArgumentException("Unknown attribute " + attribute);
+          }
         } catch(IllegalArgumentException exception) {
           plugin.getDebugger().debug(Level.WARNING, "Creatures attribute {0} not found! Check JavaDocs?", "Creatures.Content." + creature + ".attributes" + attribute);
         }
@@ -176,10 +237,21 @@ public class EnemySpawnerRegistry extends EnemySpawnerRegistryLegacy {
         dropItem = XMaterial.matchXMaterial(item).orElse(XMaterial.BEDROCK).parseItem();
       }
       plugin.getDebugger().debug("Registered CustomCreature named {0}", key);
-      enemySpawnerSet.add(new CustomCreature(plugin, waveMin, waveMax, priorityTarget, explodeTarget, key, entityType, baby, breed, age, ageLook, expDrop, holidayEffects, rates, attributes, equipments, dropItem));
+      enemySpawnerSet.add(new CustomCreature(plugin, waveMin, waveMax, priorityTarget, explodeTarget, key, entityType, baby, breed, age, ageLook, expDrop, holidayEffects, spawnWeight, rates, attributes, equipments, dropItem));
     }
 
   }
 
+  private Attribute getAttributeByName(String name) {
+    try {
+      Field field = Attribute.class.getField(name);
+      Object value = field.get(null);
+      if(value instanceof Attribute) {
+        return (Attribute) value;
+      }
+    } catch(NoSuchFieldException | IllegalAccessException ignored) {
+    }
+    return null;
+  }
 
 }

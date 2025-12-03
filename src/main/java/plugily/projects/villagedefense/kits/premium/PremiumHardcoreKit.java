@@ -22,11 +22,14 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import plugily.projects.minigamesbox.classic.handlers.language.MessageBuilder;
 import plugily.projects.minigamesbox.classic.kits.basekits.PremiumKit;
+import plugily.projects.villagedefense.Main;
 import plugily.projects.minigamesbox.classic.utils.helper.WeaponHelper;
 import plugily.projects.minigamesbox.classic.utils.version.VersionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,27 +38,30 @@ import java.util.List;
 public class PremiumHardcoreKit extends PremiumKit {
 
   public PremiumHardcoreKit() {
-    setName(new MessageBuilder("KIT_CONTENT_PREMIUM_HARDCORE_NAME").asKey().build());
-    setKey("PremiumHardcore");
+    super("PremiumHardcore",
+        new MessageBuilder("KIT_CONTENT_PREMIUM_HARDCORE_NAME").asKey().build(),
+        new ArrayList<>(),
+        new ItemStack(Material.DIAMOND_SWORD));
     List<String> description = getPlugin().getLanguageManager().getLanguageListFromKey("KIT_CONTENT_PREMIUM_HARDCORE_DESCRIPTION");
-    setDescription(description);
+    getDescription().clear();
+    getDescription().addAll(description);
     getPlugin().getKitRegistry().registerKit(this);
   }
 
   @Override
   public boolean isUnlockedByPlayer(Player player) {
-    return getPlugin().getPermissionsManager().hasPermissionString("KIT_PREMIUM_UNLOCK", player) || player.hasPermission("villagedefense.kit.premiumhardcore");
+    Main plugin = JavaPlugin.getPlugin(Main.class);
+    return plugin.getPermissionsManager().hasPermissionString("KIT_PREMIUM_UNLOCK", player) || player.hasPermission("villagedefense.kit.premiumhardcore");
   }
 
   @Override
   public void giveKitItems(Player player) {
     player.getInventory().addItem(WeaponHelper.getEnchanted(new ItemStack(getMaterial()),
-        new Enchantment[]{Enchantment.DAMAGE_ALL}, new int[]{11}));
+        new Enchantment[]{Enchantment.SHARPNESS}, new int[]{11}));
     VersionUtils.setMaxHealth(player, 6);
     player.getInventory().addItem(new ItemStack(Material.SADDLE));
   }
 
-  @Override
   public Material getMaterial() {
     return Material.DIAMOND_SWORD;
   }

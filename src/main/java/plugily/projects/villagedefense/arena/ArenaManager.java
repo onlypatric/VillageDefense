@@ -22,11 +22,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import plugily.projects.minigamesbox.classic.arena.PluginArena;
+import plugily.projects.minigamesbox.api.arena.IPluginArena;
+import plugily.projects.minigamesbox.api.user.IUser;
 import plugily.projects.minigamesbox.classic.arena.PluginArenaManager;
 import plugily.projects.minigamesbox.classic.handlers.language.MessageBuilder;
 import plugily.projects.minigamesbox.classic.handlers.language.TitleBuilder;
-import plugily.projects.minigamesbox.classic.user.User;
+import plugily.projects.minigamesbox.classic.kits.basekits.Kit;
 import plugily.projects.minigamesbox.classic.utils.version.VersionUtils;
 import plugily.projects.villagedefense.Main;
 import plugily.projects.villagedefense.api.event.wave.VillageWaveEndEvent;
@@ -48,7 +49,7 @@ public class ArenaManager extends PluginArenaManager {
   }
 
   @Override
-  public void additionalSpectatorSettings(Player player, PluginArena arena) {
+  public void additionalSpectatorSettings(Player player, IPluginArena arena) {
     super.additionalSpectatorSettings(player, arena);
     if(!plugin.getConfigPreferences().getOption("RESPAWN_IN_GAME_JOIN")) {
       plugin.getUserManager().getUser(player).setPermanentSpectator(true);
@@ -56,19 +57,23 @@ public class ArenaManager extends PluginArenaManager {
   }
 
   @Override
-  public void leaveAttempt(@NotNull Player player, @NotNull PluginArena arena) {
+  public void leaveAttempt(@NotNull Player player, @NotNull IPluginArena arena) {
     if(plugin.getUserManager().getUser(player).getKit() instanceof GolemFriendKit) {
-      ((Arena) arena).getIronGolems().stream().filter(ironGolem -> ironGolem.getCustomName().contains(player.getName()))
+      ((Arena) arena).getIronGolems().stream()
+          .filter(ironGolem -> {
+            String name = plugily.projects.villagedefense.utils.Utils.getPlainCustomName(ironGolem);
+            return name != null && name.contains(player.getName());
+          })
           .forEach(IronGolem::remove);
     }
     super.leaveAttempt(player, arena);
   }
 
   @Override
-  public void stopGame(boolean quickStop, @NotNull PluginArena arena) {
+  public void stopGame(boolean quickStop, @NotNull IPluginArena arena) {
     int wave = ((Arena) arena).getWave();
     for(Player player : arena.getPlayers()) {
-      User user = plugin.getUserManager().getUser(player);
+      IUser user = plugin.getUserManager().getUser(player);
       if(!quickStop) {
         if(user.getStatistic("HIGHEST_WAVE") <= wave) {
           if(user.isSpectator() && !plugin.getConfigPreferences().getOption("RESPAWN_AFTER_WAVE")) {
@@ -104,7 +109,7 @@ public class ArenaManager extends PluginArenaManager {
 
     new TitleBuilder("IN_GAME_MESSAGES_VILLAGE_WAVE_TITLE_END").asKey().arena(arena).integer(wave).sendArena();
 
-    for(User user : plugin.getUserManager().getUsers(arena)) {
+    for(IUser user : plugin.getUserManager().getUsers(arena)) {
       if(!user.isSpectator() && !user.isPermanentSpectator()) {
         Player player = user.getPlayer();
         plugin.getRewardsHandler().performReward(player, arena, plugin.getRewardsHandler().getRewardType("END_WAVE"));
@@ -189,10 +194,14 @@ public class ArenaManager extends PluginArenaManager {
 
     new TitleBuilder("IN_GAME_MESSAGES_VILLAGE_WAVE_TITLE_START").asKey().arena(arena).integer(wave).sendArena();
 
-    for(User user : plugin.getUserManager().getUsers(arena)) {
+    for(IUser user : plugin.getUserManager().getUsers(arena)) {
       Player player = user.getPlayer();
       if(!user.isSpectator()) {
-        user.getKit().reStock(player);
+        if(user.getKit() instanceof Kit) {
+          ((Kit) user.getKit()).reStock(player);
+        } else {
+          user.getKit().giveKitItems(player);
+        }
       }
       plugin.getRewardsHandler().performReward(player, arena, plugin.getRewardsHandler().getRewardType("START_WAVE"));
 

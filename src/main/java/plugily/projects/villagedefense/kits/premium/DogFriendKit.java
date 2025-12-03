@@ -21,13 +21,16 @@ package plugily.projects.villagedefense.kits.premium;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import plugily.projects.minigamesbox.classic.handlers.language.MessageBuilder;
 import plugily.projects.minigamesbox.classic.kits.basekits.PremiumKit;
 import plugily.projects.minigamesbox.classic.utils.helper.ArmorHelper;
 import plugily.projects.minigamesbox.classic.utils.helper.WeaponHelper;
 import plugily.projects.minigamesbox.classic.utils.version.xseries.XMaterial;
+import plugily.projects.villagedefense.Main;
 import plugily.projects.villagedefense.arena.Arena;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,23 +39,28 @@ import java.util.List;
 public class DogFriendKit extends PremiumKit {
 
   public DogFriendKit() {
-    setName(new MessageBuilder("KIT_CONTENT_DOG_FRIEND_NAME").asKey().build());
-    setKey("DogFriend");
+    super("DogFriend",
+        new MessageBuilder("KIT_CONTENT_DOG_FRIEND_NAME").asKey().build(),
+        new ArrayList<>(),
+        new ItemStack(Material.BONE));
     List<String> description = getPlugin().getLanguageManager().getLanguageListFromKey("KIT_CONTENT_DOG_FRIEND_DESCRIPTION");
-    setDescription(description);
-    getPlugin().getKitRegistry().registerKit(this);
+    getDescription().clear();
+    getDescription().addAll(description);
+    Main plugin = JavaPlugin.getPlugin(Main.class);
+    plugin.getKitRegistry().registerKit(this);
   }
 
   @Override
   public boolean isUnlockedByPlayer(Player player) {
-    return getPlugin().getPermissionsManager().hasPermissionString("KIT_PREMIUM_UNLOCK", player) || player.hasPermission("villagedefense.kit.dogfriend");
+    Main plugin = JavaPlugin.getPlugin(Main.class);
+    return plugin.getPermissionsManager().hasPermissionString("KIT_PREMIUM_UNLOCK", player) || player.hasPermission("villagedefense.kit.dogfriend");
   }
 
   @Override
   public void giveKitItems(Player player) {
     player.getInventory().addItem(WeaponHelper.getUnBreakingSword(WeaponHelper.ResourceType.STONE, 10));
     ArmorHelper.setArmor(player, ArmorHelper.ArmorType.LEATHER);
-    player.getInventory().addItem(new ItemStack(XMaterial.COOKED_PORKCHOP.parseMaterial(), 8));
+    player.getInventory().addItem(new ItemStack(XMaterial.COOKED_PORKCHOP.get(), 8));
     player.getInventory().addItem(new ItemStack(Material.SADDLE));
     Arena arena = (Arena) getPlugin().getArenaRegistry().getArena(player);
     if(arena == null) {
@@ -64,7 +72,6 @@ public class DogFriendKit extends PremiumKit {
     }
   }
 
-  @Override
   public Material getMaterial() {
     return Material.BONE;
   }

@@ -28,14 +28,17 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
+import plugily.projects.minigamesbox.api.user.IUser;
 import plugily.projects.minigamesbox.classic.handlers.language.MessageBuilder;
 import plugily.projects.minigamesbox.classic.kits.basekits.PremiumKit;
-import plugily.projects.minigamesbox.classic.user.User;
+import plugily.projects.villagedefense.Main;
 import plugily.projects.minigamesbox.classic.utils.helper.ArmorHelper;
 import plugily.projects.minigamesbox.classic.utils.helper.WeaponHelper;
 import plugily.projects.minigamesbox.classic.utils.version.VersionUtils;
 import plugily.projects.minigamesbox.classic.utils.version.events.api.PlugilyPlayerInteractEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -45,22 +48,27 @@ import java.util.List;
 public class ShotBowKit extends PremiumKit implements Listener {
 
   public ShotBowKit() {
-    setName(new MessageBuilder("KIT_CONTENT_SHOT_BOW_NAME").asKey().build());
-    setKey("ShotBow");
+    super("ShotBow",
+        new MessageBuilder("KIT_CONTENT_SHOT_BOW_NAME").asKey().build(),
+        new ArrayList<>(),
+        new ItemStack(Material.BOW));
     List<String> description = getPlugin().getLanguageManager().getLanguageListFromKey("KIT_CONTENT_SHOT_BOW_DESCRIPTION");
-    setDescription(description);
-    getPlugin().getServer().getPluginManager().registerEvents(this, getPlugin());
-    getPlugin().getKitRegistry().registerKit(this);
+    getDescription().clear();
+    getDescription().addAll(description);
+    Main plugin = JavaPlugin.getPlugin(Main.class);
+    plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    plugin.getKitRegistry().registerKit(this);
   }
 
   @Override
   public boolean isUnlockedByPlayer(Player player) {
-    return getPlugin().getPermissionsManager().hasPermissionString("KIT_PREMIUM_UNLOCK", player) || player.hasPermission("villagedefense.kit.shotbow");
+    Main plugin = JavaPlugin.getPlugin(Main.class);
+    return plugin.getPermissionsManager().hasPermissionString("KIT_PREMIUM_UNLOCK", player) || player.hasPermission("villagedefense.kit.shotbow");
   }
 
   @Override
   public void giveKitItems(Player player) {
-    player.getInventory().addItem(WeaponHelper.getEnchantedBow(new Enchantment[]{Enchantment.DURABILITY, Enchantment.ARROW_KNOCKBACK}, new int[]{10, 1}));
+    player.getInventory().addItem(WeaponHelper.getEnchantedBow(new Enchantment[]{Enchantment.UNBREAKING, Enchantment.PUNCH}, new int[]{10, 1}));
     player.getInventory().addItem(new ItemStack(getMaterial(), 64));
     player.getInventory().addItem(new ItemStack(getMaterial(), 64));
     ArmorHelper.setColouredArmor(Color.YELLOW, player);
@@ -68,7 +76,6 @@ public class ShotBowKit extends PremiumKit implements Listener {
     player.getInventory().addItem(new ItemStack(Material.SADDLE));
   }
 
-  @Override
   public Material getMaterial() {
     return Material.ARROW;
   }
@@ -91,7 +98,7 @@ public class ShotBowKit extends PremiumKit implements Listener {
     if(!e.getPlayer().getInventory().contains(getMaterial()))
       return;
 
-    User user = getPlugin().getUserManager().getUser(e.getPlayer());
+    IUser user = getPlugin().getUserManager().getUser(e.getPlayer());
     if(user.isSpectator() || !(user.getKit() instanceof ShotBowKit)) {
       return;
     }
@@ -99,10 +106,10 @@ public class ShotBowKit extends PremiumKit implements Listener {
       return;
     }
     for(int i = 0; i < 4; i++) {
-      Bukkit.getScheduler().runTaskLater(getPlugin(), () -> {
+      Main plugin = JavaPlugin.getPlugin(Main.class);
+      Bukkit.getScheduler().runTaskLater(plugin, () -> {
         Arrow pr = e.getPlayer().launchProjectile(Arrow.class);
         pr.setVelocity(e.getPlayer().getLocation().getDirection().multiply(3));
-        pr.setBounce(false);
         pr.setShooter(e.getPlayer());
         pr.setCritical(true);
 

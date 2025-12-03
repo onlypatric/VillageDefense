@@ -30,6 +30,7 @@ import plugily.projects.minigamesbox.classic.utils.helper.WeaponHelper;
 import plugily.projects.minigamesbox.classic.utils.version.VersionUtils;
 import plugily.projects.minigamesbox.classic.utils.version.xseries.XMaterial;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,10 +39,13 @@ import java.util.List;
 public class HealerKit extends LevelKit {
 
   public HealerKit() {
-    setName(new MessageBuilder("KIT_CONTENT_HEALER_NAME").asKey().build());
-    setKey("Healer");
+    super("Healer",
+        new MessageBuilder("KIT_CONTENT_HEALER_NAME").asKey().build(),
+        new ArrayList<>(),
+        new ItemStack(XMaterial.POPPY.get()));
     List<String> description = getPlugin().getLanguageManager().getLanguageListFromKey("KIT_CONTENT_HEALER_DESCRIPTION");
-    setDescription(description);
+    getDescription().clear();
+    getDescription().addAll(description);
     setLevel(getKitsConfig().getInt("Required-Level.Healer"));
     getPlugin().getKitRegistry().registerKit(this);
   }
@@ -55,23 +59,22 @@ public class HealerKit extends LevelKit {
   public void giveKitItems(Player player) {
     player.getInventory().addItem(WeaponHelper.getUnBreakingSword(WeaponHelper.ResourceType.WOOD, 10));
     ArmorHelper.setColouredArmor(Color.WHITE, player);
-    player.getInventory().addItem(new ItemStack(XMaterial.COOKED_PORKCHOP.parseMaterial(), 8));
-    player.getInventory().addItem(VersionUtils.getPotion(PotionType.INSTANT_HEAL, 2, true));
-    player.getInventory().addItem(VersionUtils.getPotion(PotionType.REGEN, 1, true));
+    player.getInventory().addItem(new ItemStack(XMaterial.COOKED_PORKCHOP.get(), 8));
+    player.getInventory().addItem(VersionUtils.getPotion(PotionType.HEALING, 2, true));
+    player.getInventory().addItem(VersionUtils.getPotion(PotionType.REGENERATION, 1, true));
   }
 
-  @Override
   public Material getMaterial() {
-    return XMaterial.POPPY.parseMaterial();
+    return XMaterial.POPPY.get();
   }
 
   @Override
   public void reStock(Player player) {
     for(int i = 0; i < 2; i++) {
-      player.getInventory().addItem(VersionUtils.getPotion(PotionType.INSTANT_HEAL, 2, true));
+      player.getInventory().addItem(VersionUtils.getPotion(PotionType.HEALING, 2, true));
     }
     for(int i = 0; i < 2; i++) {
-      player.getInventory().addItem(VersionUtils.getPotion(PotionType.REGEN, 1, true));
+      player.getInventory().addItem(VersionUtils.getPotion(PotionType.REGENERATION, 1, true));
     }
   }
 }

@@ -65,16 +65,16 @@ public class CustomRideableCreature {
     Entity entity = VersionUtils.spawnEntity(location, entityType);
     if(entity instanceof Creature) {
       Creature creature = (Creature) entity;
-      creature.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(200D);
+      creature.getAttribute(Attribute.FOLLOW_RANGE).setBaseValue(200D);
       for(Map.Entry<Attribute, Double> attribute : attributes.entrySet()) {
         creature.getAttribute(attribute.getKey()).setBaseValue(attribute.getValue());
-        if(attribute.getKey() == Attribute.GENERIC_MAX_HEALTH) {
+        if(attribute.getKey() == Attribute.MAX_HEALTH) {
           VersionUtils.setMaxHealth(creature, attribute.getValue());
           creature.setHealth(attribute.getValue());
         }
       }
-      creature.setRemoveWhenFarAway(false);
-      if(ServerVersion.Version.isCurrentEqualOrHigher(ServerVersion.Version.v1_16_R3)) {
+      creature.setPersistent(true);
+      if(ServerVersion.Version.isCurrentEqualOrHigher(ServerVersion.Version.v1_16)) {
         creature.setInvisible(false);
       }
       return creature;

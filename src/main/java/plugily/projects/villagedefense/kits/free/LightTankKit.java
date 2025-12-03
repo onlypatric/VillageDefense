@@ -28,6 +28,7 @@ import plugily.projects.minigamesbox.classic.utils.helper.WeaponHelper;
 import plugily.projects.minigamesbox.classic.utils.version.VersionUtils;
 import plugily.projects.minigamesbox.classic.utils.version.xseries.XMaterial;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,10 +37,13 @@ import java.util.List;
 public class LightTankKit extends FreeKit {
 
   public LightTankKit() {
-    setName(new MessageBuilder("KIT_CONTENT_LIGHT_TANK_NAME").asKey().build());
-    setKey("LightTank");
+    super("LightTank",
+        new MessageBuilder("KIT_CONTENT_LIGHT_TANK_NAME").asKey().build(),
+        new ArrayList<>(),
+        new ItemStack(Material.LEATHER_CHESTPLATE));
     List<String> description = getPlugin().getLanguageManager().getLanguageListFromKey("KIT_CONTENT_LIGHT_TANK_DESCRIPTION");
-    setDescription(description);
+    getDescription().clear();
+    getDescription().addAll(description);
     getPlugin().getKitRegistry().registerKit(this);
   }
 
@@ -51,13 +55,12 @@ public class LightTankKit extends FreeKit {
   @Override
   public void giveKitItems(Player player) {
     player.getInventory().addItem(WeaponHelper.getUnBreakingSword(WeaponHelper.ResourceType.WOOD, 10));
-    player.getInventory().addItem(new ItemStack(XMaterial.COOKED_PORKCHOP.parseMaterial(), 8));
+    player.getInventory().addItem(new ItemStack(XMaterial.COOKED_PORKCHOP.get(), 8));
     ArmorHelper.setArmor(player, ArmorHelper.ArmorType.IRON);
     VersionUtils.setMaxHealth(player, 26.0);
     player.setHealth(26.0);
   }
 
-  @Override
   public Material getMaterial() {
     return Material.LEATHER_CHESTPLATE;
   }

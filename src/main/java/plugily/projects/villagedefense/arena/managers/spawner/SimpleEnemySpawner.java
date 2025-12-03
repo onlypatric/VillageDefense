@@ -143,7 +143,6 @@ public interface SimpleEnemySpawner extends EnemySpawner {
     arena.getEnemies().add(creature);
   }
 
-  //TODO Simplify creature spawn reduce to one method e.g. spawn; add weight to creatures configurable!
   @Override
   default void spawn(Random random, Arena arena, int spawn) {
     int wave = arena.getWave();

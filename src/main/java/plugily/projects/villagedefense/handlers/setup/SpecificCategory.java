@@ -38,19 +38,19 @@ public class SpecificCategory extends PluginSpecificCategory {
   public void addItems(NormalFastInv gui) {
     super.addItems(gui);
 
-    MultiLocationItem zombieSpawn = new MultiLocationItem(getSetupInventory(), new ItemBuilder(XMaterial.ROTTEN_FLESH.parseMaterial()), "Zombie Spawn", "Click add new zombie spawn\non the place you're standing at.", "zombiespawns", 2);
+    MultiLocationItem zombieSpawn = new MultiLocationItem(getSetupInventory(), new ItemBuilder(XMaterial.ROTTEN_FLESH.get()), "Zombie Spawn", "Click add new zombie spawn\non the place you're standing at.", "zombiespawns", 2);
     gui.setItem((getInventoryLine() * 9) + 1, zombieSpawn);
     getItemList().add(zombieSpawn);
 
-    MultiLocationItem villagerSpawns = new MultiLocationItem(getSetupInventory(), new ItemBuilder(XMaterial.ROTTEN_FLESH.parseMaterial()), "Villager Spawn", "Click add new villager spawn\non the place you're standing at.", "villagerspawns", 2);
+    MultiLocationItem villagerSpawns = new MultiLocationItem(getSetupInventory(), new ItemBuilder(XMaterial.ROTTEN_FLESH.get()), "Villager Spawn", "Click add new villager spawn\non the place you're standing at.", "villagerspawns", 2);
     gui.setItem((getInventoryLine() * 9) + 2, villagerSpawns);
     getItemList().add(villagerSpawns);
 
-    MaterialMultiLocationItem door = new MaterialMultiLocationItem(getSetupInventory(), new ItemBuilder(XMaterial.OAK_DOOR.parseMaterial()), "Game Door", "Doors will be regenerated\n each game, villagers will\n hide in houses so you can put\n doors to keep zombies away!", "doors", MaterialUtils.DOORS, false, 0);
+    MaterialMultiLocationItem door = new MaterialMultiLocationItem(getSetupInventory(), new ItemBuilder(XMaterial.OAK_DOOR.get()), "Game Door", "Doors will be regenerated\n each game, villagers will\n hide in houses so you can put\n doors to keep zombies away!", "doors", MaterialUtils.DOORS, false, 0);
     gui.setItem((getInventoryLine() * 9) + 3, door);
     getItemList().add(door);
 
-    MaterialLocationItem chest = new MaterialLocationItem(getSetupInventory(), new ItemBuilder(XMaterial.CHEST.parseMaterial()), "Game Shop", "Look at (double-) chest with items\nand click it to set it as game shop.\n(it allows to click villagers to buy game items)\nRemember to set item prices for the game\nusing /vda setprice command!", "shop", XMaterial.CHEST.parseMaterial());
+    MaterialLocationItem chest = new MaterialLocationItem(getSetupInventory(), new ItemBuilder(XMaterial.CHEST.get()), "Game Shop", "Look at (double-) chest with items\nand click it to set it as game shop.\n(it allows to click villagers to buy game items)\nRemember to set item prices for the game\nusing /vda setprice command!", "shop", XMaterial.CHEST.get());
     gui.setItem((getInventoryLine() * 9) + 4, chest);
     getItemList().add(chest);
   }

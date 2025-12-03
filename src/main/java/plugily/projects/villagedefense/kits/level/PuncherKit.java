@@ -29,6 +29,7 @@ import plugily.projects.minigamesbox.classic.utils.helper.ArmorHelper;
 import plugily.projects.minigamesbox.classic.utils.helper.WeaponHelper;
 import plugily.projects.minigamesbox.classic.utils.version.xseries.XMaterial;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -37,10 +38,13 @@ import java.util.List;
 public class PuncherKit extends LevelKit {
 
   public PuncherKit() {
-    setName(new MessageBuilder("KIT_CONTENT_PUNCHER_NAME").asKey().build());
-    setKey("Puncher");
+    super("Puncher",
+        new MessageBuilder("KIT_CONTENT_PUNCHER_NAME").asKey().build(),
+        new ArrayList<>(),
+        new ItemStack(XMaterial.DIAMOND_SHOVEL.get()));
     List<String> description = getPlugin().getLanguageManager().getLanguageListFromKey("KIT_CONTENT_PUNCHER_DESCRIPTION");
-    setDescription(description);
+    getDescription().clear();
+    getDescription().addAll(description);
     setLevel(getKitsConfig().getInt("Required-Level.Puncher"));
     getPlugin().getKitRegistry().registerKit(this);
   }
@@ -53,16 +57,15 @@ public class PuncherKit extends LevelKit {
   @Override
   public void giveKitItems(Player player) {
     player.getInventory().addItem(WeaponHelper.getEnchanted(XMaterial.DIAMOND_SHOVEL.parseItem(), new Enchantment[]{
-        Enchantment.DURABILITY, Enchantment.KNOCKBACK, Enchantment.DAMAGE_ALL}, new int[]{10, 5, 2}));
+        Enchantment.UNBREAKING, Enchantment.KNOCKBACK, Enchantment.SHARPNESS}, new int[]{10, 5, 2}));
     ArmorHelper.setColouredArmor(Color.BLACK, player);
-    player.getInventory().addItem(WeaponHelper.getEnchantedBow(Enchantment.DURABILITY, 5));
+    player.getInventory().addItem(WeaponHelper.getEnchantedBow(Enchantment.UNBREAKING, 5));
     player.getInventory().addItem(new ItemStack(Material.ARROW, 25));
-    player.getInventory().addItem(new ItemStack(XMaterial.COOKED_PORKCHOP.parseMaterial(), 8));
+    player.getInventory().addItem(new ItemStack(XMaterial.COOKED_PORKCHOP.get(), 8));
   }
 
-  @Override
   public Material getMaterial() {
-    return XMaterial.DIAMOND_SHOVEL.parseMaterial();
+    return XMaterial.DIAMOND_SHOVEL.get();
   }
 
   @Override

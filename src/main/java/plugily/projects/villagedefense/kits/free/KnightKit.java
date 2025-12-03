@@ -27,6 +27,7 @@ import plugily.projects.minigamesbox.classic.utils.helper.ArmorHelper;
 import plugily.projects.minigamesbox.classic.utils.helper.WeaponHelper;
 import plugily.projects.minigamesbox.classic.utils.version.xseries.XMaterial;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,10 +36,13 @@ import java.util.List;
 public class KnightKit extends FreeKit {
 
   public KnightKit() {
-    setName(new MessageBuilder("KIT_CONTENT_KNIGHT_NAME").asKey().build());
-    setKey("Knight");
+    super("Knight",
+        new MessageBuilder("KIT_CONTENT_KNIGHT_NAME").asKey().build(),
+        new ArrayList<>(),
+        new ItemStack(XMaterial.WOODEN_SWORD.get()));
     List<String> description = getPlugin().getLanguageManager().getLanguageListFromKey("KIT_CONTENT_KNIGHT_DESCRIPTION");
-    setDescription(description);
+    getDescription().clear();
+    getDescription().addAll(description);
     getPlugin().getKitRegistry().registerKit(this);
     getPlugin().getKitRegistry().setDefaultKit(this);
   }
@@ -52,13 +56,12 @@ public class KnightKit extends FreeKit {
   public void giveKitItems(Player player) {
     player.getInventory().addItem(WeaponHelper.getUnBreakingSword(WeaponHelper.ResourceType.WOOD, 10));
     ArmorHelper.setArmor(player, ArmorHelper.ArmorType.LEATHER);
-    player.getInventory().addItem(new ItemStack(XMaterial.COOKED_PORKCHOP.parseMaterial(), 8));
+    player.getInventory().addItem(new ItemStack(XMaterial.COOKED_PORKCHOP.get(), 8));
 
   }
 
-  @Override
   public Material getMaterial() {
-    return XMaterial.WOODEN_SWORD.parseMaterial();
+    return XMaterial.WOODEN_SWORD.get();
   }
 
   @Override

@@ -116,7 +116,7 @@ public class EntityUpgradeListener implements Listener {
         }
       }
       for(Creature zombie : new ArrayList<>(arena.getEnemies())) {
-        zombie.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 5, 0));
+        zombie.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 5, 0));
         zombie.damage(0.5, livingEntity);
       }
     }
@@ -126,7 +126,7 @@ public class EntityUpgradeListener implements Listener {
   public void onEntityClick(PlugilyPlayerInteractEntityEvent event) {
     if((event.getRightClicked().getType() != EntityType.IRON_GOLEM && event.getRightClicked().getType() != EntityType.WOLF)
         || VersionUtils.checkOffHand(event.getHand()) || !event.getPlayer().isSneaking()
-        || event.getRightClicked().getCustomName() == null) {
+        || plugily.projects.villagedefense.utils.Utils.getPlainCustomName(event.getRightClicked()) == null) {
       return;
     }
 

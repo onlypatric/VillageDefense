@@ -28,6 +28,7 @@ import plugily.projects.minigamesbox.classic.utils.helper.WeaponHelper;
 import plugily.projects.minigamesbox.classic.utils.version.VersionUtils;
 import plugily.projects.minigamesbox.classic.utils.version.xseries.XMaterial;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,10 +37,13 @@ import java.util.List;
 public class MediumTankKit extends LevelKit {
 
   public MediumTankKit() {
-    setName(new MessageBuilder("KIT_CONTENT_MEDIUM_TANK_NAME").asKey().build());
-    setKey("MediumTank");
+    super("MediumTank",
+        new MessageBuilder("KIT_CONTENT_MEDIUM_TANK_NAME").asKey().build(),
+        new ArrayList<>(),
+        new ItemStack(Material.IRON_CHESTPLATE));
     List<String> description = getPlugin().getLanguageManager().getLanguageListFromKey("KIT_CONTENT_MEDIUM_TANK_DESCRIPTION");
-    setDescription(description);
+    getDescription().clear();
+    getDescription().addAll(description);
     setLevel(getKitsConfig().getInt("Required-Level.MediumTank"));
     getPlugin().getKitRegistry().registerKit(this);
   }
@@ -52,13 +56,12 @@ public class MediumTankKit extends LevelKit {
   @Override
   public void giveKitItems(Player player) {
     player.getInventory().addItem(WeaponHelper.getUnBreakingSword(WeaponHelper.ResourceType.WOOD, 10));
-    player.getInventory().addItem(new ItemStack(XMaterial.COOKED_PORKCHOP.parseMaterial(), 8));
+    player.getInventory().addItem(new ItemStack(XMaterial.COOKED_PORKCHOP.get(), 8));
     ArmorHelper.setArmor(player, ArmorHelper.ArmorType.IRON);
     VersionUtils.setMaxHealth(player, 32.0);
     player.setHealth(32.0);
   }
 
-  @Override
   public Material getMaterial() {
     return Material.IRON_CHESTPLATE;
   }
